@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upvote</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+
+  :root{
+    --bg:#121218;
+    --surface:#1c1c26;
+    --surface-2:#26262f;
+    --text:#f3f0e8;
+    --text-dim:#9b98a6;
+    --accent:#ff6a39;
+    --accent-ink:#2a1206;
+    --accent-warm:#ffc24b;
+    --good:#6fcf97;
+    --line: rgba(243,240,232,.12);
+    --line-strong: rgba(243,240,232,.22);
+    --shadow: 0 24px 60px rgba(0,0,0,.45);
+    --grain-opacity: .05;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f4efe4;
+      --surface:#ffffff;
+      --surface-2:#eae3d2;
+      --text:#201d1a;
+      --text-dim:#6b655c;
+      --accent:#e85a2a;
+      --accent-ink:#fff3ea;
+      --accent-warm:#c98a1d;
+      --good:#2f8f5b;
+      --line: rgba(32,29,26,.14);
+      --line-strong: rgba(32,29,26,.28);
+      --shadow: 0 24px 50px rgba(32,29,26,.14);
+      --grain-opacity: .035;
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f4efe4;
+    --surface:#ffffff;
+    --surface-2:#eae3d2;
+    --text:#201d1a;
+    --text-dim:#6b655c;
+    --accent:#e85a2a;
+    --accent-ink:#fff3ea;
+    --accent-warm:#c98a1d;
+    --good:#2f8f5b;
+    --line: rgba(32,29,26,.14);
+    --line-strong: rgba(32,29,26,.28);
+    --shadow: 0 24px 50px rgba(32,29,26,.14);
+    --grain-opacity: .035;
+    color-scheme: light;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Barlow Condensed','Arial Narrow',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+    text-wrap:balance;
+  }
+  .mono{
+    font-family:'IBM Plex Mono',ui-monospace,monospace;
+    letter-spacing:.02em;
+  }
+  button{font-family:inherit;}
+  ::selection{background:var(--accent);color:var(--accent-ink);}
+
+  /* ---------- shell ---------- */
+  .shell{
+    max-width:1180px;
+    margin:0 auto;
+    padding:20px 24px 64px;
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding-bottom:18px;
+    margin-bottom:22px;
+    border-bottom:1px solid var(--line);
+  }
+  .wordmark{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  .wordmark .mark{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:800;
+    font-size:28px;
+    letter-spacing:.01em;
+    text-transform:uppercase;
+  }
+  .wordmark .mark span{color:var(--accent);}
+  .wordmark .tag{
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .topbar-right{display:flex;align-items:center;gap:14px;}
+  .theme-toggle{
+    display:flex;
+    border:1px solid var(--line-strong);
+    border-radius:999px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  .theme-toggle button{
+    border:0;background:none;color:var(--text-dim);
+    font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    padding:7px 13px;cursor:pointer;
+  }
+  .theme-toggle button.active{background:var(--accent);color:var(--accent-ink);}
+
+  .status-pill{
+    display:flex;align-items:center;gap:7px;
+    font-size:11px;color:var(--text-dim);
+    border:1px dashed var(--line-strong);
+    border-radius:999px;
+    padding:6px 12px;
+  }
+  .status-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--good);}
+
+  /* ---------- niche rail ---------- */
+  .niche-rail{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:22px;
+    margin-bottom:6px;
+  }
+  .niche-pill{
+    flex:0 0 auto;
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    color:var(--text-dim);
+    padding:8px 16px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .15s, color .15s, border-color .15s;
+    white-space:nowrap;
+  }
+  .niche-pill:hover{border-color:var(--accent);}
+  .niche-pill.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+
+  /* ---------- main layout ---------- */
+  .stage-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 320px;
+    gap:34px;
+    align-items:start;
+  }
+  @media (max-width:880px){
+    .stage-row{grid-template-columns:1fr;}
+  }
+
+  /* ---------- phone stage ---------- */
+  .stage-wrap{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:16px;
+  }
+  .dots-nav{
+    display:flex;flex-direction:column;gap:8px;
+    padding-top:56px;
+  }
+  .dots-nav button{
+    width:6px;height:22px;border-radius:3px;
+    border:0;background:var(--line-strong);cursor:pointer;padding:0;
+    transition:background .15s, height .15s;
+  }
+  .dots-nav button.active{background:var(--accent);height:30px;}
+
+  .phone{
+    position:relative;
+    width:300px;
+    height:534px;
+    border-radius:26px;
+    overflow:hidden;
+    background:var(--surface-2);
+    box-shadow:var(--shadow);
+    border:1px solid var(--line-strong);
+  }
+  .still{
+    position:absolute;inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    opacity:0;
+    transition:opacity .35s ease;
+  }
+  .still.active{opacity:1;}
+  .still .grain{
+    position:absolute;inset:0;
+    opacity:var(--grain-opacity);
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .still .vignette{
+    position:absolute;inset:0;
+    background:radial-gradient(120% 90% at 50% 30%, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 100%);
+  }
+  .still-body{
+    position:relative;z-index:2;
+    padding:18px 18px 20px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .rec{
+    position:absolute;top:14px;left:14px;z-index:2;
+    display:flex;align-items:center;gap:6px;
+    font-size:10px;color:#f3f0e8;
+    background:rgba(0,0,0,.35);
+    border-radius:999px;padding:4px 9px 4px 7px;
+  }
+  .rec .rdot{width:6px;height:6px;border-radius:50%;background:#ff5252;animation:blink 1.4s infinite;}
+  @keyframes blink{0%,60%{opacity:1;}30%{opacity:.25;}}
+  .niche-tag{
+    position:absolute;top:14px;right:14px;z-index:2;
+    font-size:10px;text-transform:uppercase;letter-spacing:.08em;
+    background:rgba(0,0,0,.35);color:#f3f0e8;
+    border-radius:999px;padding:5px 10px;
+  }
+  .play-glyph{
+    position:absolute;inset:0;z-index:2;
+    display:flex;align-items:center;justify-content:center;
+    opacity:.85;pointer-events:none;
+  }
+  .hook-text{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:800;
+    font-size:25px;
+    line-height:1.05;
+    color:#f8f6f0;
+    text-shadow:0 2px 14px rgba(0,0,0,.5);
+    text-transform:none;
+    text-wrap:balance;
+  }
+  .handle-row{
+    display:flex;align-items:center;gap:8px;
+    color:#f3f0e8cc;font-size:12.5px;font-weight:600;
+  }
+  .handle-row .mono{color:#f3f0e8a8;font-weight:500;font-size:11px;}
+
+  .phone-nav-btns{
+    display:flex;flex-direction:column;gap:10px;
+    padding-top:56px;
+  }
+  .phone-nav-btns button{
+    width:38px;height:38px;border-radius:50%;
+    background:var(--surface);border:1px solid var(--line-strong);
+    color:var(--text);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:border-color .15s, transform .1s;
+  }
+  .phone-nav-btns button:hover{border-color:var(--accent);}
+  .phone-nav-btns button:active{transform:scale(.92);}
+
+  /* ---------- action rail ---------- */
+  .action-rail{
+    position:absolute;right:10px;bottom:96px;z-index:3;
+    display:flex;flex-direction:column;gap:14px;
+    align-items:center;
+  }
+  .action-btn{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    background:none;border:0;cursor:pointer;color:#f3f0e8;
+  }
+  .action-btn .icon-circle{
+    width:38px;height:38px;border-radius:50%;
+    background:rgba(18,18,24,.55);
+    border:1px solid rgba(243,240,232,.35);
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s, border-color .15s, transform .1s;
+  }
+  .action-btn:hover .icon-circle{border-color:var(--accent);}
+  .action-btn:active .icon-circle{transform:scale(.9);}
+  .action-btn.rated .icon-circle{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+  .action-btn .lbl{font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;color:#f3f0e8;text-shadow:0 1px 4px rgba(0,0,0,.6);}
+  .action-btn .score{font-size:9px;color:var(--accent-warm);font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- rating popover ---------- */
+  .popover{
+    position:absolute;
+    right:56px;
+    z-index:5;
+    background:var(--surface);
+    border:1px solid var(--line-strong);
+    border-radius:14px;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+    width:186px;
+    display:none;
+  }
+  .popover.open{display:block;}
+  .popover h4{
+    margin:0 0 8px;
+    font-size:13px;
+    letter-spacing:.02em;
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    text-transform:none;
+    font-weight:700;
+  }
+  .rate-dots{display:flex;gap:6px;margin-bottom:4px;}
+  .rate-dots button{
+    width:24px;height:24px;border-radius:50%;
+    border:1px solid var(--line-strong);
+    background:var(--surface-2);
+    color:var(--text-dim);
+    font-size:11px;font-family:'IBM Plex Mono',monospace;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .rate-dots button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+  .popover .hint{font-size:10.5px;color:var(--text-dim);}
+
+  /* ---------- side column ---------- */
+  .side-col{display:flex;flex-direction:column;gap:18px;}
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px;
+  }
+  .card h3{
+    font-size:16px;font-weight:700;margin:0 0 4px;
+    letter-spacing:.01em;
+  }
+  .card .sub{font-size:12px;color:var(--text-dim);margin-bottom:14px;}
+
+  .g2g-bar-track{
+    height:6px;border-radius:999px;background:var(--surface-2);
+    overflow:hidden;margin-bottom:8px;
+  }
+  .g2g-bar-fill{
+    height:100%;background:var(--accent);width:0%;
+    transition:width .3s ease;
+  }
+  .g2g-count{font-size:12px;color:var(--text-dim);margin-bottom:14px;}
+  .g2g-count strong{color:var(--text);font-family:'IBM Plex Mono',monospace;font-weight:500;}
+  .submit-btn{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--line-strong);
+    background:var(--surface-2);
+    color:var(--text-dim);
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:.01em;
+    cursor:not-allowed;
+    transition:background .2s, color .2s, border-color .2s;
+  }
+  .submit-btn.unlocked{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:var(--accent-ink);
+    cursor:pointer;
+  }
+
+  .feedback-list{display:flex;flex-direction:column;gap:10px;position:relative;}
+  .feedback-item{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 12px;
+    font-size:12.5px;
+    line-height:1.45;
+  }
+  .feedback-item .kind{
+    display:inline-block;
+    font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;
+    padding:2px 7px;border-radius:999px;margin-bottom:6px;
+    font-weight:700;
+  }
+  .kind.good{background:color-mix(in srgb, var(--good) 20%, transparent);color:var(--good);}
+  .kind.bad{background:color-mix(in srgb, var(--accent) 18%, transparent);color:var(--accent);}
+  .kind.unclear{background:color-mix(in srgb, var(--accent-warm) 22%, transparent);color:var(--accent-warm);}
+  .feedback-item .who{color:var(--text-dim);font-size:11px;margin-top:6px;font-family:'IBM Plex Mono',monospace;}
+
+  .locked-wrap{position:relative;}
+  .locked-wrap .feedback-list{filter:blur(6px);user-select:none;pointer-events:none;}
+  .lock-overlay{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;text-align:center;padding:14px;
+    background:color-mix(in srgb, var(--surface) 55%, transparent);
+    border-radius:10px;
+  }
+  .lock-overlay .lk{font-size:11px;color:var(--text-dim);max-width:200px;line-height:1.4;}
+  .lock-overlay .lk strong{color:var(--text);}
+
+  .principle{
+    display:flex;gap:10px;
+    font-size:12.5px;
+    color:var(--text-dim);
+    line-height:1.5;
+    padding:10px 0;
+    border-top:1px solid var(--line);
+  }
+  .principle:first-of-type{border-top:0;padding-top:0;}
+  .principle b{color:var(--text);}
+
+  .footnote{
+    margin-top:34px;
+    display:flex;align-items:center;gap:10px;
+    font-size:12px;color:var(--text-dim);
+    border-top:1px solid var(--line);
+    padding-top:16px;
+  }
+  .footnote .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-warm);flex:0 0 auto;}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="wordmark">
+      <span class="mark">Up<span>vote</span></span>
+      <span class="tag mono">Erst testen. Dann posten.</span>
+    </div>
+    <div class="topbar-right">
+      <div class="status-pill"><span class="dot"></span>Konzept-Vorschau · MVP läuft aktuell als Discord</div>
+      <div class="theme-toggle" role="group" aria-label="Theme">
+        <button data-theme-btn="light">Hell</button>
+        <button data-theme-btn="dark" class="active">Dunkel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="niche-rail" id="nicheRail"></div>
+
+  <div class="stage-row">
+    <div class="stage-wrap">
+      <div class="dots-nav" id="dotsNav"></div>
+
+      <div class="phone" id="phone">
+        <!-- stills injected by JS -->
+        <div class="action-rail" id="actionRail"></div>
+      </div>
+
+      <div class="phone-nav-btns">
+        <button id="btnPrev" title="Vorheriges Video" aria-label="Vorheriges Video">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="btnNext" title="Nächstes Video" aria-label="Nächstes Video">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="side-col">
+      <div class="card">
+        <h3>Give&nbsp;to&nbsp;Get</h3>
+        <div class="sub">Wer Feedback für sein Video will, gibt zuerst welches.</div>
+        <div class="g2g-bar-track"><div class="g2g-bar-fill" id="g2gFill"></div></div>
+        <div class="g2g-count">Reviews gegeben: <strong id="g2gCount">0</strong> / 3</div>
+        <button class="submit-btn" id="submitBtn" disabled>Eigenes Video einreichen</button>
+      </div>
+
+      <div class="card locked-wrap" id="feedbackCard">
+        <h3>Fremd-Feedback</h3>
+        <div class="sub" id="feedbackSub">Bewerte zuerst selbst dieses Video, dann sind die Reviews anderer Creator sichtbar.</div>
+        <div class="feedback-list" id="feedbackList"></div>
+        <div class="lock-overlay" id="lockOverlay">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8"/></svg>
+          <div class="lk">Verhindert Meinungs-Kopieren: <strong>erst reviewen, dann sehen.</strong></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Prinzip</h3>
+        <div class="principle"><b>01</b> Strukturiert statt "krass, bro" — feste Kategorien je Video.</div>
+        <div class="principle"><b>02</b> Nach Nische sortiert, damit Feedback von Leuten kommt, die sie verstehen.</div>
+        <div class="principle"><b>03</b> Reputation statt Reichweite — Reviewer werden an ihrer Trefferquote gemessen.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote"><span class="dot"></span>Standbilder sind generierte Platzhalter je Nische, keine echten Video-Uploads — diese Ansicht zeigt die App-Richtung, während der Discord-Test noch läuft.</div>
+</div>
+
+<script>
+(function(){
+  const NICHES = ["Alle","Comedy","Storytelling","Fitness","Gaming","Food","Beauty"];
+
+  const VIDEOS = [
+    {
+      niche:"Comedy",
+      handle:"@jonah.clips",
+      hook:"Ich hab meinem Chef versehentlich eine Sprachnachricht geschickt.",
+      len:"0:34",
+      grad:"radial-gradient(120% 90% at 20% 15%, #ff8a5c 0%, #a8341c 42%, #2a1410 100%)",
+    },
+    {
+      niche:"Storytelling",
+      handle:"@lea.erzaehlt",
+      hook:"Der Moment, in dem ich merkte: das war ein Fehler.",
+      len:"0:51",
+      grad:"radial-gradient(120% 90% at 75% 20%, #6f7bd6 0%, #2c3170 45%, #0f1024 100%)",
+    },
+    {
+      niche:"Fitness",
+      handle:"@davidlifts",
+      hook:"Warum dein Bankdrücken seit Monaten nicht wächst.",
+      len:"0:41",
+      grad:"radial-gradient(120% 90% at 30% 80%, #ffd76a 0%, #c97a1b 45%, #241606 100%)",
+    },
+    {
+      niche:"Gaming",
+      handle:"@kira.plays",
+      hook:"3 Sekunden vor dem Clutch dachte ich schon: verloren.",
+      len:"0:28",
+      grad:"radial-gradient(120% 90% at 70% 75%, #6fe0c8 0%, #1c6e63 45%, #071716 100%)",
+    },
+    {
+      niche:"Food",
+      handle:"@tomkocht",
+      hook:"Das teuerste Gericht, das ich je gekocht habe.",
+      len:"0:46",
+      grad:"radial-gradient(120% 90% at 25% 25%, #ff9f6e 0%, #b3521f 45%, #241109 100%)",
+    },
+    {
+      niche:"Beauty",
+      handle:"@nilaglow",
+      hook:"Der Fehler, den fast jeder beim Concealer macht.",
+      len:"0:37",
+      grad:"radial-gradient(120% 90% at 80% 30%, #f295c2 0%, #9c3d72 45%, #200a17 100%)",
+    },
+  ];
+
+  const CATS = [
+    {key:"hook", label:"Hook", icon:'<path d="M9 3v9a4 4 0 0 0 8 0v-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="3" r="1.6" fill="currentColor"/>'},
+    {key:"story", label:"Story", icon:'<path d="M4 6h13a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'},
+    {key:"pacing", label:"Pacing", icon:'<path d="M4 16l3-7 3 10 3-13 3 8 3-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>'},
+    {key:"retention", label:"Bleibt", icon:'<circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.4" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="0.9" fill="currentColor"/>'},
+  ];
+
+  const OTHER_FEEDBACK = {
+    hook:[
+      {kind:"good", text:"Der erste Satz sitzt sofort — man will wissen, wie es weitergeht.", who:"@priya.reviews"},
+      {kind:"unclear", text:"Der Einstieg ist gut, aber das Bild dazu passt nicht zum Satz.", who:"@marek.k"},
+    ],
+    story:[
+      {kind:"bad", text:"Der Mittelteil zieht sich, da würde ich 4 Sekunden kürzen.", who:"@sana.edits"},
+      {kind:"good", text:"Der Spannungsbogen ist klar erkennbar, sauber aufgebaut.", who:"@finn.reviews"},
+    ],
+    pacing:[
+      {kind:"unclear", text:"Der Schnitt bei Sekunde 12 wirkt abgehackt, war das Absicht?", who:"@lotta.cuts"},
+      {kind:"good", text:"Tempo passt zur Pointe, kein Leerlauf zwischendrin.", who:"@denizreviews"},
+    ],
+    retention:[
+      {kind:"bad", text:"Nach der Pointe hätte ich sofort weggescrollt, kein Grund zu bleiben.", who:"@omar.watches"},
+      {kind:"good", text:"Der Cliffhanger am Ende hält mich für die Fortsetzung da.", who:"@ivy.reviews"},
+    ],
+  };
+
+  let currentNiche = "Alle";
+  let currentIndex = 0;
+  let ratings = {};
+  let reviewsGiven = 0;
+  let openPopover = null;
+
+  function filteredList(){
+    if(currentNiche === "Alle") return VIDEOS.map((v,i)=>i);
+    return VIDEOS.map((v,i)=>i).filter(i => VIDEOS[i].niche === currentNiche);
+  }
+
+  function buildNicheRail(){
+    const rail = document.getElementById('nicheRail');
+    rail.innerHTML = '';
+    NICHES.forEach(n=>{
+      const btn = document.createElement('button');
+      btn.className = 'niche-pill' + (n===currentNiche ? ' active' : '');
+      btn.textContent = n;
+      btn.addEventListener('click', ()=>{
+        currentNiche = n;
+        const list = filteredList();
+        currentIndex = list.length ? list[0] : 0;
+        renderAll();
+      });
+      rail.appendChild(btn);
+    });
+  }
+
+  function buildPhone(){
+    const phone = document.getElementById('phone');
+    const rail = document.getElementById('actionRail');
+    phone.querySelectorAll('.still').forEach(n=>n.remove());
+
+    VIDEOS.forEach((v,i)=>{
+      const still = document.createElement('div');
+      still.className = 'still';
+      still.dataset.idx = i;
+      still.style.background = v.grad;
+      still.innerHTML = `
+        <div class="grain"></div>
+        <div class="vignette"></div>
+        <div class="rec"><span class="rdot"></span>REC ${v.len}</div>
+        <div class="niche-tag mono">${v.niche}</div>
+        <div class="play-glyph">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="rgba(255,255,255,.85)"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,.25)"/><path d="M10 8l7 4-7 4V8z" fill="#fff"/></svg>
+        </div>
+        <div class="still-body">
+          <div class="hook-text">${v.hook}</div>
+          <div class="handle-row">${v.handle} <span class="mono">· ${v.niche.toLowerCase()}</span></div>
+        </div>
+      `;
+      phone.insertBefore(still, rail);
+    });
+
+    rail.innerHTML = '';
+    CATS.forEach(cat=>{
+      const wrap = document.createElement('div');
+      wrap.style.position='relative';
+      const btn = document.createElement('button');
+      btn.className = 'action-btn';
+      btn.dataset.cat = cat.key;
+      btn.innerHTML = `
+        <span class="icon-circle"><svg width="17" height="17" viewBox="0 0 24 24" fill="none">${cat.icon}</svg></span>
+        <span class="lbl">${cat.label}</span>
+        <span class="score mono" data-score></span>
+      `;
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        togglePopover(cat.key, btn);
+      });
+
+      const pop = document.createElement('div');
+      pop.className = 'popover';
+      pop.dataset.cat = cat.key;
+      pop.innerHTML = `
+        <h4>${cat.label}</h4>
+        <div class="rate-dots">
+          ${[1,2,3,4,5].map(n=>`<button data-n="${n}">${n}</button>`).join('')}
+        </div>
+        <div class="hint">1 = schwach, 5 = stark</div>
+      `;
+      pop.querySelectorAll('button[data-n]').forEach(b=>{
+        b.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          rate(cat.key, parseInt(b.dataset.n,10));
+        });
+      });
+
+      wrap.appendChild(btn);
+      wrap.appendChild(pop);
+      rail.appendChild(wrap);
+    });
+
+    document.addEventListener('click', ()=>{ closePopovers(); });
+  }
+
+  function closePopovers(){
+    document.querySelectorAll('.popover.open').forEach(p=>p.classList.remove('open'));
+    openPopover = null;
+  }
+
+  function togglePopover(catKey, anchorBtn){
+    const pop = document.querySelector(`.popover[data-cat="${catKey}"]`);
+    const wasOpen = pop.classList.contains('open');
+    closePopovers();
+    if(!wasOpen){
+      pop.classList.add('open');
+      pop.style.bottom = (anchorBtn.offsetTop - 8) + 'px';
+      openPopover = pop;
+    }
+  }
+
+  function rate(catKey, n){
+    const vi = currentIndex;
+    if(!ratings[vi]) ratings[vi] = {};
+    const isFirstCatForVideo = Object.keys(ratings[vi]).length === 0;
+    ratings[vi][catKey] = n;
+    if(isFirstCatForVideo){
+      reviewsGiven = Math.min(3, reviewsGiven + 1);
+    }
+    closePopovers();
+    renderRail();
+    renderFeedbackUnlock();
+    renderG2G();
+  }
+
+  function renderRail(){
+    const vi = currentIndex;
+    const r = ratings[vi] || {};
+    document.querySelectorAll('.action-btn').forEach(btn=>{
+      const key = btn.dataset.cat;
+      const scoreEl = btn.querySelector('[data-score]');
+      if(r[key] !== undefined){
+        btn.classList.add('rated');
+        scoreEl.textContent = r[key] + '/5';
+      } else {
+        btn.classList.remove('rated');
+        scoreEl.textContent = '';
+      }
+    });
+    document.querySelectorAll('.popover .rate-dots').forEach(dotsWrap=>{
+      const catKey = dotsWrap.parentElement.dataset.cat;
+      const val = r[catKey];
+      dotsWrap.querySelectorAll('button').forEach(b=>{
+        b.classList.toggle('on', val !== undefined && parseInt(b.dataset.n,10) <= val);
+      });
+    });
+  }
+
+  function renderFeedbackUnlock(){
+    const vi = currentIndex;
+    const rated = !!(ratings[vi] && Object.keys(ratings[vi]).length > 0);
+    const overlay = document.getElementById('lockOverlay');
+    const sub = document.getElementById('feedbackSub');
+    const list = document.getElementById('feedbackList');
+    const card = document.getElementById('feedbackCard');
+
+    list.innerHTML = '';
+    const v = VIDEOS[vi];
+    const sourceKeys = rated ? Object.keys(ratings[vi]) : CATS.map(c=>c.key);
+    const seen = new Set();
+    sourceKeys.forEach(k=>{
+      (OTHER_FEEDBACK[k]||[]).forEach(item=>{
+        const id = k+item.who;
+        if(seen.has(id)) return;
+        seen.add(id);
+        const el = document.createElement('div');
+        el.className = 'feedback-item';
+        el.innerHTML = `<span class="kind ${item.kind}">${item.kind === 'good' ? 'Gut, weil' : item.kind === 'bad' ? 'Schlecht, weil' : 'Unklar, weil'}</span>
+          <div>${item.text}</div>
+          <div class="who">${item.who} · ${CATS.find(c=>c.key===k).label}</div>`;
+        list.appendChild(el);
+      });
+    });
+
+    if(rated){
+      card.classList.remove('locked-wrap');
+      overlay.style.display = 'none';
+      sub.textContent = `Feedback anderer Creator zu "${v.hook.slice(0,28)}…"`;
+    } else {
+      card.classList.add('locked-wrap');
+      overlay.style.display = 'flex';
+      sub.textContent = 'Bewerte zuerst selbst dieses Video, dann sind die Reviews anderer Creator sichtbar.';
+    }
+  }
+
+  function renderG2G(){
+    document.getElementById('g2gCount').textContent = reviewsGiven;
+    document.getElementById('g2gFill').style.width = (reviewsGiven/3*100) + '%';
+    const btn = document.getElementById('submitBtn');
+    if(reviewsGiven >= 3){
+      btn.disabled = false;
+      btn.classList.add('unlocked');
+      btn.textContent = 'Eigenes Video einreichen';
+    } else {
+      btn.disabled = true;
+      btn.classList.remove('unlocked');
+      btn.textContent = `Noch ${3-reviewsGiven} Review${3-reviewsGiven===1?'':'s'} bis Einreichung`;
+    }
+  }
+
+  function renderStill(){
+    document.querySelectorAll('.still').forEach(s=>{
+      s.classList.toggle('active', parseInt(s.dataset.idx,10) === currentIndex);
+    });
+  }
+
+  function renderDots(){
+    const nav = document.getElementById('dotsNav');
+    const list = filteredList();
+    nav.innerHTML = '';
+    list.forEach(i=>{
+      const b = document.createElement('button');
+      b.className = i===currentIndex ? 'active' : '';
+      b.addEventListener('click', ()=>{ currentIndex = i; renderAll(); });
+      nav.appendChild(b);
+    });
+  }
+
+  function step(dir){
+    const list = filteredList();
+    const pos = list.indexOf(currentIndex);
+    let next = pos;
+    if(pos === -1){ next = 0; }
+    else { next = (pos + dir + list.length) % list.length; }
+    currentIndex = list[next];
+    renderAll();
+  }
+
+  function renderAll(){
+    buildNicheRail();
+    renderStill();
+    renderDots();
+    renderRail();
+    renderFeedbackUnlock();
+    renderG2G();
+  }
+
+  document.getElementById('btnPrev').addEventListener('click', ()=>step(-1));
+  document.getElementById('btnNext').addEventListener('click', ()=>step(1));
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'ArrowUp'){ step(-1); }
+    if(e.key === 'ArrowDown'){ step(1); }
+  });
+
+  let wheelLock = false;
+  document.getElementById('phone').addEventListener('wheel', (e)=>{
+    e.preventDefault();
+    if(wheelLock) return;
+    wheelLock = true;
+    step(e.deltaY > 0 ? 1 : -1);
+    setTimeout(()=>{ wheelLock = false; }, 380);
+  }, {passive:false});
+
+  document.getElementById('submitBtn').addEventListener('click', ()=>{
+    if(reviewsGiven < 3) return;
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = 'Im Test-Pool eingereicht';
+  });
+
+  document.querySelectorAll('[data-theme-btn]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const mode = b.dataset.themeBtn;
+      document.documentElement.setAttribute('data-theme', mode);
+      document.querySelectorAll('[data-theme-btn]').forEach(x=>x.classList.toggle('active', x===b));
+    });
+  });
+
+  buildPhone();
+  renderAll();
+})();
+</script>
+</body>
+</html>
