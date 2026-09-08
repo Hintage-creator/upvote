@@ -1,0 +1,17 @@
+{
+  "name": "koran-app",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build:shared": "npm run build -w packages/shared",
+    "dev:api": "npm run dev -w apps/api",
+    "test:api": "npm run test -w apps/api",
+    "test:shared": "npm run test -w packages/shared",
+    "predev:mobile": "npm run build:shared",
+    "dev:mobile": "npm run start -w apps/mobile",
+    "dev:mobile:web": "npm run build:shared && npm run web -w apps/mobile"
+  }
+}
