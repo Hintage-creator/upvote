@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
-import { Animated, LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { ScriptDisplayMode, useScriptDisplayMode } from './ScriptDisplayModeContext';
+import { AnimatedPressable } from '../../components/animations/AnimatedPressable';
 
 const OPTIONS: { mode: ScriptDisplayMode; labelDe: string }[] = [
   { mode: 'latin', labelDe: 'Latein' },
@@ -51,16 +52,17 @@ export function ScriptModeToggle() {
       {OPTIONS.map((opt) => {
         const active = opt.mode === mode;
         return (
-          <Pressable
+          <AnimatedPressable
             key={opt.mode}
             onPress={() => selectMode(opt.mode)}
             onLayout={(e) => handleLayout(opt.mode, e)}
             style={styles.segment}
+            pressScale={0.92}
             accessibilityRole="button"
             accessibilityState={{ selected: active }}
           >
             <Text style={[styles.label, active && styles.labelActive]}>{opt.labelDe}</Text>
-          </Pressable>
+          </AnimatedPressable>
         );
       })}
     </View>

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Animated, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Animated, StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { getLanguagePack } from '../../data/languages';
 import { lessonById, phrasesByIds, vocabByIds } from '../../data/contentLookup';
@@ -9,11 +9,15 @@ import { ScriptText } from '../script/ScriptText';
 import { buildQuiz, checkTranslationAnswer } from './quizGenerator';
 import { QuizQuestion } from '../../types/content';
 import { progressRepository } from '../progress';
-import { addXp, gradeReview, initReviewState, recordActivity } from '../progress/srs';
+import { addXp, computeLevel, gradeReview, initReviewState, recordActivity } from '../progress/srs';
 import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
 import { AnimatedBar } from '../../components/animations/AnimatedBar';
+import { AnimatedCounter } from '../../components/animations/AnimatedCounter';
+import { AnimatedPressable } from '../../components/animations/AnimatedPressable';
 import { useShake } from '../../components/animations/useShake';
 import { Celebration } from '../../components/animations/Celebration';
+import { FloatingText } from '../../components/animations/FloatingText';
+import { LevelUpBanner } from '../../components/animations/LevelUpBanner';
 
 type Props = NativeStackScreenProps<CourseStackParamList, 'Quiz'>;
 
@@ -41,6 +45,9 @@ export function QuizScreen({ route, navigation }: Props) {
   const [revealed, setRevealed] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [xpToastKey, setXpToastKey] = useState(0);
+  const [levelUpKey, setLevelUpKey] = useState(0);
+  const [levelUpValue, setLevelUpValue] = useState(1);
   const resultPop = useRef(new Animated.Value(0.7)).current;
 
   if (!lesson || questions.length === 0) {
@@ -63,7 +70,16 @@ export function QuizScreen({ route, navigation }: Props) {
 
     if (isCorrect) {
       const progress = await progressRepository.getUserProgress();
-      await progressRepository.saveUserProgress(addXp(progress, XP_PER_CORRECT_ANSWER));
+      const levelBefore = computeLevel(progress.xp);
+      const withXp = addXp(progress, XP_PER_CORRECT_ANSWER);
+      await progressRepository.saveUserProgress(withXp);
+      setXpToastKey(Date.now());
+
+      const levelAfter = computeLevel(withXp.xp);
+      if (levelAfter > levelBefore) {
+        setLevelUpValue(levelAfter);
+        setLevelUpKey(Date.now());
+      }
     }
   }
 
@@ -107,17 +123,19 @@ export function QuizScreen({ route, navigation }: Props) {
         <Animated.View style={[styles.resultBlock, { transform: [{ scale: resultPop }] }]}>
           {passed ? <Celebration /> : null}
           <Text style={styles.resultTitle}>{passed ? 'Rätsel gelöst!' : 'Noch nicht ganz…'}</Text>
-          <Text style={styles.resultScore}>
-            {correctCount} / {questions.length} richtig
-          </Text>
+          <AnimatedCounter
+            value={correctCount}
+            suffix={` / ${questions.length} richtig`}
+            style={styles.resultScore}
+          />
           <Text style={styles.resultMessage}>
             {passed
               ? 'Ein Steinblock gleitet zur Seite — der Weg in die nächste Kammer ist frei.'
               : `Kungbäkola braucht mindestens ${Math.ceil(questions.length * PASS_RATIO)} richtige Antworten, um diese Kammer zu knacken. Versuch es noch einmal!`}
           </Text>
-          <Pressable style={styles.primaryButton} onPress={() => navigation.goBack()} accessibilityRole="button">
+          <AnimatedPressable style={styles.primaryButton} onPress={() => navigation.goBack()} accessibilityRole="button">
             <Text style={styles.primaryButtonText}>Zurück zur Kammer</Text>
-          </Pressable>
+          </AnimatedPressable>
         </Animated.View>
       </View>
     );
@@ -125,6 +143,7 @@ export function QuizScreen({ route, navigation }: Props) {
 
   return (
     <View style={styles.screen}>
+      <LevelUpBanner level={levelUpValue} triggerKey={levelUpKey} />
       <View style={styles.progressBlock}>
         <Text style={styles.progressLabel}>
           Frage {index + 1} / {questions.length}
@@ -134,6 +153,7 @@ export function QuizScreen({ route, navigation }: Props) {
 
       <FadeSlideIn key={index} duration={280} distance={10}>
         <View style={styles.promptCard}>
+          <FloatingText text={`+${XP_PER_CORRECT_ANSWER} XP`} triggerKey={xpToastKey} />
           <ScriptText script={question.prompt} size="large" />
           <Text style={styles.promptHint}>Was bedeutet das auf Deutsch?</Text>
         </View>
@@ -164,9 +184,9 @@ export function QuizScreen({ route, navigation }: Props) {
               autoCorrect={false}
             />
             {!revealed ? (
-              <Pressable style={styles.primaryButton} onPress={handleTranslationSubmit} accessibilityRole="button" testID="quiz-submit">
+              <AnimatedPressable style={styles.primaryButton} onPress={handleTranslationSubmit} accessibilityRole="button" testID="quiz-submit">
                 <Text style={styles.primaryButtonText}>Prüfen</Text>
-              </Pressable>
+              </AnimatedPressable>
             ) : (
               <Text style={styles.answerReveal}>Richtige Antwort: {question.acceptedAnswers[0]}</Text>
             )}
@@ -174,9 +194,9 @@ export function QuizScreen({ route, navigation }: Props) {
         )}
 
         {revealed ? (
-          <Pressable style={styles.primaryButton} onPress={goNext} accessibilityRole="button" testID="quiz-next">
+          <AnimatedPressable style={styles.primaryButton} onPress={goNext} accessibilityRole="button" testID="quiz-next">
             <Text style={styles.primaryButtonText}>{index + 1 >= questions.length ? 'Ergebnis anzeigen' : 'Weiter'}</Text>
-          </Pressable>
+          </AnimatedPressable>
         ) : null}
       </FadeSlideIn>
     </View>
@@ -217,9 +237,10 @@ function QuizChoice({
 
   return (
     <Animated.View style={[shakeStyle, { transform: [...shakeStyle.transform, { scale }] }]}>
-      <Pressable
+      <AnimatedPressable
         onPress={onPress}
         disabled={revealed}
+        pressScale={0.97}
         accessibilityRole="button"
         testID={`quiz-choice-${index}`}
         style={[
@@ -229,7 +250,7 @@ function QuizChoice({
         ]}
       >
         <Text style={styles.choiceText}>{label}</Text>
-      </Pressable>
+      </AnimatedPressable>
     </Animated.View>
   );
 }
@@ -246,6 +267,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     marginBottom: 20,
+    position: 'relative',
   },
   promptHint: { fontSize: 12, color: colors.textMuted, marginTop: 10 },
   choices: { gap: 10 },

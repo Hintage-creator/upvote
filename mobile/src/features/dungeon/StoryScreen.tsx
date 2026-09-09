@@ -1,7 +1,8 @@
 import React from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
+import { AnimatedPressable } from '../../components/animations/AnimatedPressable';
 
 interface Props {
   onDone: () => void;
@@ -41,9 +42,9 @@ export function StoryScreen({ onDone, buttonLabel = 'Die Pyramide betreten' }: P
         ))}
       </ScrollView>
       <FadeSlideIn delay={250 + PARAGRAPHS.length * 220}>
-        <Pressable style={styles.button} onPress={onDone} accessibilityRole="button">
+        <AnimatedPressable style={styles.button} onPress={onDone} accessibilityRole="button">
           <Text style={styles.buttonText}>{buttonLabel}</Text>
-        </Pressable>
+        </AnimatedPressable>
       </FadeSlideIn>
     </View>
   );

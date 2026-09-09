@@ -102,12 +102,20 @@ mobile/
   `react-native-reanimated`: keine zusätzliche native Abhängigkeit, kein
   Babel-Plugin, funktioniert identisch auf Web/iOS/Android. Bausteine:
   `FadeSlideIn` (Eintritts-Animation, mit `delay` für gestaffelte Listen),
-  `useShake`/`usePulse` (Hooks, die einen Animated-Style + Trigger liefern),
-  `AnimatedBar` (weiche Balken-Füllung für Quiz-Fortschritt/XP-Level),
-  `Celebration` (Partikel-Burst beim gelösten Rätsel). Eingesetzt u. a. für
-  den Ruß-Avatar-Crossfade in `CatAvatar`, den gleitenden Indikator in
-  `ScriptModeToggle`, gestaffelte Karten-Listen in Kurs/Lektion/Phrasenbuch
-  und Quiz-Feedback (Wackeln bei falscher Antwort, Bounce bei richtiger).
+  `useShake`/`usePulse`/`useWiggle` (Hooks, die einen Animated-Style + ggf.
+  Trigger liefern), `AnimatedBar` (weiche Balken-Füllung für Quiz-Fortschritt/
+  XP-Level), `AnimatedCounter` (Zahlen zählen sanft hoch/runter statt zu
+  springen), `AnimatedPressable` (jeder Button im Screen federt beim Antippen
+  leicht ein — Drop-in-Ersatz für `Pressable`, überall eingesetzt),
+  `FloatingText` (aufsteigendes „+5 XP“ bei richtiger Antwort), `LevelUpBanner`
+  (Banner + Konfetti bei Levelaufstieg), `Celebration` (Partikel-Burst beim
+  gelösten Rätsel). Eingesetzt u. a. für den Ruß-Avatar-Crossfade in
+  `CatAvatar`, den gleitenden Indikator in `ScriptModeToggle`, gestaffelte
+  Karten-Listen in Kurs/Lektion/Phrasenbuch, wackelnde Schloss-Icons auf
+  gesperrten Kammern, Quiz-Feedback (Wackeln bei falscher Antwort, Bounce bei
+  richtiger, XP-Popup, Levelaufstieg), Tab-Icons, die beim Fokussieren
+  hüpfen, und einen animierten Kungbäkola-Ladebildschirm statt eines
+  generischen Spinners.
 
 ## Setup & Ausführen
 

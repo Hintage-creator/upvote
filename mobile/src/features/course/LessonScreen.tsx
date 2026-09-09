@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { getLanguagePack } from '../../data/languages';
 import { grammarByIds, lessonById, phrasesByIds, vocabByIds } from '../../data/contentLookup';
@@ -9,8 +9,10 @@ import { ScriptText } from '../script/ScriptText';
 import { ScriptModeToggle } from '../script/ScriptModeToggle';
 import { ReviewBadge } from '../script/ReviewBadge';
 import { progressRepository } from '../progress';
-import { addXp, recordActivity } from '../progress/srs';
+import { addXp, computeLevel, recordActivity } from '../progress/srs';
 import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
+import { AnimatedPressable } from '../../components/animations/AnimatedPressable';
+import { LevelUpBanner } from '../../components/animations/LevelUpBanner';
 
 type Props = NativeStackScreenProps<CourseStackParamList, 'Lesson'>;
 
@@ -23,6 +25,8 @@ export function LessonScreen({ route, navigation }: Props) {
   const lesson = lessonById(pack, lessonId);
   const [completed, setCompleted] = useState(false);
   const [justCompleted, setJustCompleted] = useState(false);
+  const [levelUpKey, setLevelUpKey] = useState(0);
+  const [levelUpValue, setLevelUpValue] = useState(1);
   const bounce = React.useRef(new Animated.Value(1)).current;
 
   const hasQuizzableContent = useMemo(
@@ -41,6 +45,7 @@ export function LessonScreen({ route, navigation }: Props) {
   async function markCompleted() {
     await progressRepository.markLessonCompleted(lessonId);
     const progress = await progressRepository.getUserProgress();
+    const levelBefore = computeLevel(progress.xp);
     const withActivity = recordActivity(progress);
     const withXp = addXp(withActivity, XP_PER_LESSON);
     await progressRepository.saveUserProgress(withXp);
@@ -48,12 +53,20 @@ export function LessonScreen({ route, navigation }: Props) {
     setJustCompleted(true);
     bounce.setValue(0.85);
     Animated.spring(bounce, { toValue: 1, useNativeDriver: true, speed: 14, bounciness: 12 }).start();
+
+    const levelAfter = computeLevel(withXp.xp);
+    if (levelAfter > levelBefore) {
+      setLevelUpValue(levelAfter);
+      setLevelUpKey(Date.now());
+    }
   }
 
   let itemIndex = 0;
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <View style={styles.screen}>
+      <LevelUpBanner level={levelUpValue} triggerKey={levelUpKey} />
+      <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <FadeSlideIn>
         <Text style={styles.title}>{lesson.titleDe}</Text>
         {lesson.descriptionDe ? <Text style={styles.description}>{lesson.descriptionDe}</Text> : null}
@@ -135,20 +148,22 @@ export function LessonScreen({ route, navigation }: Props) {
 
       <View style={styles.actions}>
         <Animated.View style={justCompleted ? { transform: [{ scale: bounce }] } : undefined}>
-          <Pressable style={styles.completeButton} onPress={markCompleted}>
+          <AnimatedPressable style={styles.completeButton} onPress={markCompleted} accessibilityRole="button">
             <Text style={styles.completeButtonText}>{completed ? 'Kammer studiert ✓' : 'Als studiert markieren'}</Text>
-          </Pressable>
+          </AnimatedPressable>
         </Animated.View>
         {hasQuizzableContent ? (
-          <Pressable
+          <AnimatedPressable
             style={styles.quizButton}
             onPress={() => navigation.navigate('Quiz', { lessonId })}
+            accessibilityRole="button"
           >
             <Text style={styles.quizButtonText}>Rätsel lösen</Text>
-          </Pressable>
+          </AnimatedPressable>
         ) : null}
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 

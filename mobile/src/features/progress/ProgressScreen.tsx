@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { progressRepository } from './index';
 import { UserProgress, xpToNextLevel } from './srs';
@@ -10,6 +10,8 @@ import { computeSootStage, SOOT_STAGE_LABELS_DE } from '../dungeon/dungeon';
 import { StoryScreen } from '../dungeon/StoryScreen';
 import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
 import { AnimatedBar } from '../../components/animations/AnimatedBar';
+import { AnimatedCounter } from '../../components/animations/AnimatedCounter';
+import { AnimatedPressable } from '../../components/animations/AnimatedPressable';
 
 const pack = getLanguagePack('mnk');
 
@@ -60,23 +62,23 @@ export function ProgressScreen() {
           <View style={styles.avatarTextBlock}>
             <Text style={styles.header}>Kungbäkola</Text>
             <Text style={styles.sootLabel}>{SOOT_STAGE_LABELS_DE[sootStage]} vom Pyramidenstaub</Text>
-            <Pressable onPress={() => setStoryVisible(true)}>
+            <AnimatedPressable onPress={() => setStoryVisible(true)} pressScale={0.94} accessibilityRole="button">
               <Text style={styles.storyLink}>Geschichte noch einmal ansehen</Text>
-            </Pressable>
+            </AnimatedPressable>
           </View>
         </View>
       </FadeSlideIn>
 
       <FadeSlideIn delay={60}>
         <View style={styles.row}>
-          <StatCard label="Streak" value={`${progress.currentStreak} 🔥`} sub={`Bestwert: ${progress.longestStreak}`} />
-          <StatCard label="Level" value={String(currentLevel)} sub={`${xpIntoLevel} / ${xpNeededForNext} XP`} />
+          <StatCard label="Streak" numericValue={progress.currentStreak} suffix=" 🔥" sub={`Bestwert: ${progress.longestStreak}`} />
+          <StatCard label="Level" numericValue={currentLevel} sub={`${xpIntoLevel} / ${xpNeededForNext} XP`} />
         </View>
       </FadeSlideIn>
       <FadeSlideIn delay={110}>
         <View style={styles.row}>
-          <StatCard label="Fällige Wiederholungen" value={String(dueCount)} sub="warten auf dich" />
-          <StatCard label="Kammern gelöst" value={String(completedLessonIds.length)} sub={`von ${pack.lessons.length}`} />
+          <StatCard label="Fällige Wiederholungen" numericValue={dueCount} sub="warten auf dich" />
+          <StatCard label="Kammern gelöst" numericValue={completedLessonIds.length} sub={`von ${pack.lessons.length}`} />
         </View>
       </FadeSlideIn>
 
@@ -103,11 +105,11 @@ export function ProgressScreen() {
   );
 }
 
-function StatCard({ label, value, sub }: { label: string; value: string; sub: string }) {
+function StatCard({ label, numericValue, suffix, sub }: { label: string; numericValue: number; suffix?: string; sub: string }) {
   return (
     <View style={styles.statCard}>
       <Text style={styles.statLabel}>{label}</Text>
-      <Text style={styles.statValue}>{value}</Text>
+      <AnimatedCounter value={numericValue} suffix={suffix} style={styles.statValue} />
       <Text style={styles.statSub}>{sub}</Text>
     </View>
   );

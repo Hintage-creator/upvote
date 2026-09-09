@@ -1,12 +1,12 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
 import { RootTabParamList } from './types';
 import { CourseNavigator } from './CourseNavigator';
 import { PhrasebookScreen } from '../features/phrasebook/PhrasebookScreen';
 import { ProgressScreen } from '../features/progress/ProgressScreen';
 import { colors } from '../theme/colors';
+import { AnimatedTabIcon } from './AnimatedTabIcon';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
@@ -24,7 +24,7 @@ export function AppNavigator() {
           headerShown: false,
           tabBarActiveTintColor: colors.primaryDark,
           tabBarInactiveTintColor: colors.textMuted,
-          tabBarIcon: () => <Text style={{ fontSize: 18 }}>{TAB_ICONS[route.name]}</Text>,
+          tabBarIcon: ({ focused }) => <AnimatedTabIcon emoji={TAB_ICONS[route.name]} focused={focused} />,
         })}
       >
         <Tab.Screen name="CourseTab" component={CourseNavigator} options={{ title: 'Pyramide' }} />

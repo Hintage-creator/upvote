@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Alert, Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Animated, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { getLanguagePack } from '../../data/languages';
 import { lessonsForUnit, unitsSorted } from '../../data/contentLookup';
@@ -10,6 +10,8 @@ import { isLessonUnlocked } from '../dungeon/dungeon';
 import { progressRepository } from '../progress';
 import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
 import { useShake } from '../../components/animations/useShake';
+import { useWiggle } from '../../components/animations/useWiggle';
+import { AnimatedPressable } from '../../components/animations/AnimatedPressable';
 import { Lesson } from '../../types/content';
 
 type Props = NativeStackScreenProps<CourseStackParamList, 'CourseList'>;
@@ -85,12 +87,14 @@ function LessonCard({
   onPress: () => void;
 }) {
   const { style: shakeStyle, shake } = useShake();
+  const wiggleStyle = useWiggle(!unlocked);
 
   return (
     <FadeSlideIn delay={Math.min(index, 8) * 50}>
       <Animated.View style={shakeStyle}>
-        <Pressable
+        <AnimatedPressable
           style={[styles.lessonCard, !unlocked && styles.lessonCardLocked]}
+          pressScale={0.98}
           onPress={() => {
             if (!unlocked) {
               shake();
@@ -101,16 +105,16 @@ function LessonCard({
           }}
           accessibilityRole="button"
         >
-          <View style={[styles.lessonLevelBadge, !unlocked && styles.lessonLevelBadgeLocked]}>
+          <Animated.View style={[styles.lessonLevelBadge, !unlocked && styles.lessonLevelBadgeLocked, unlocked ? undefined : wiggleStyle]}>
             <Text style={styles.lessonLevelText}>{unlocked ? (isCompleted ? '✓' : lesson.level) : '🔒'}</Text>
-          </View>
+          </Animated.View>
           <View style={styles.lessonTextBlock}>
             <Text style={[styles.lessonTitle, !unlocked && styles.textLocked]}>{lesson.titleDe}</Text>
             {lesson.descriptionDe ? (
               <Text style={[styles.lessonDescription, !unlocked && styles.textLocked]}>{lesson.descriptionDe}</Text>
             ) : null}
           </View>
-        </Pressable>
+        </AnimatedPressable>
       </Animated.View>
     </FadeSlideIn>
   );
