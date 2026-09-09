@@ -118,11 +118,15 @@ verarbeitet mit Pillow (Python), Skript nicht Teil des Repos:
   Padding für die System-Maskierung) sollte später ein echter Icon-Export
   aus dem Original-Design nachgereicht werden.
 - `assets/mascot/soot-0.png` … `soot-4.png`: dieselbe Icon-Kachel,
-  programmatisch mit zunehmender Entsättigung + Abdunkelung + leichtem
-  Korn-Rauschen zu einer "Ruß"-Stufe verarbeitet (siehe `CatAvatar.tsx`).
-  Das sind **keine zusätzlichen handgezeichneten Varianten** — falls später
-  echte Illustrationen für jede Stufe entstehen, ersetzen sie einfach diese
-  Dateien 1:1.
+  programmatisch zu 5 "Ruß"-Stufen verarbeitet — bei Stufe 4 ist das Fell
+  fast vollständig schwarz (angelehnt an ein Referenzfoto einer schwarzen
+  Katze), die Augen bleiben bewusst hell/ausgespart, und nur die
+  Katzen-Silhouette wird abgedunkelt, nicht der goldene Pyramiden-
+  Hintergrund (Masken + zunehmende Entsättigung/Abdunkelung/Korn, siehe
+  `CatAvatar.tsx`). Das sind **keine zusätzlichen handgezeichneten
+  Varianten**, sondern ein Bildfilter über demselben Ausgangsbild — falls
+  später echte Illustrationen für jede Stufe entstehen, ersetzen sie
+  einfach diese Dateien 1:1.
 - `assets/mascot/story-standing.png` / `story-lying.png`: Zuschnitt der
   "Stehend – Vorderansicht" bzw. "Liegend – Vorderansicht"-Kacheln aus dem
   Original-Konzeptbild, unverändert.
