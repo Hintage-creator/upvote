@@ -120,7 +120,23 @@ hat nur Vers-Audio, keine Einzelwort-Aussprache. `VocabItem.referenceAudioUrl`
 bleibt `null`. Optionen dafür: eine TTS-Stimme (z. B. Azure/Google TTS mit
 arabischer Stimme) oder eigene Aufnahmen mit einem Muttersprachler.
 
-## Setup & Ausführen
+## Schnelle Web-Vorschau ohne Setup
+
+`demo/index.html` ist eine einzelne, eigenständige HTML-Datei ohne Build-Schritt
+und ohne Backend — Inhalte (Verse, Vokabeln, Alphabet), SM-2-Logik und
+Gamification sind 1:1 aus `packages/shared` portiert. Einfach lokal im Browser
+öffnen (Doppelklick auf die Datei, oder `npx serve demo`). Fortschritt wird nur
+lokal im Browser (`localStorage`) gespeichert.
+
+Zwei Dinge fehlen bewusst gegenüber der echten App, weil sie einen echten
+Netzwerkzugriff bzw. eine unsandboxte Umgebung brauchen:
+- **Referenz-Audio-Wiedergabe** (die everyayah.com-URLs werden nicht geladen)
+- **Mikrofon-Aufnahme** kann je nach Browser/Kontext eingeschränkt sein
+
+Lektionen, Quiz (mit echter serverloser Bewertung), Fortschritt/XP/Streaks/
+Abzeichen und das komplette Alphabet-Referenzblatt sind voll interaktiv.
+
+## Setup & Ausführen (volle App: Expo + Backend)
 
 ```bash
 npm install                  # installiert alle Workspaces
