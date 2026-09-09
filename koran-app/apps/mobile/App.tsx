@@ -8,6 +8,7 @@ import { RecordScreen } from "./src/screens/RecordScreen";
 import { FeedbackScreen } from "./src/screens/FeedbackScreen";
 import { QuizScreen } from "./src/screens/QuizScreen";
 import { ProfileScreen } from "./src/screens/ProfileScreen";
+import { AlphabetScreen } from "./src/screens/AlphabetScreen";
 import { colors } from "./src/theme";
 
 function Router() {
@@ -33,6 +34,8 @@ function Router() {
       return <QuizScreen lessonId={route.lessonId} />;
     case "profile":
       return <ProfileScreen />;
+    case "alphabet":
+      return <AlphabetScreen />;
   }
 }
 

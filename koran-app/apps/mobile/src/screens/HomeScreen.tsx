@@ -27,6 +27,13 @@ export function HomeScreen() {
         <Text style={styles.profileLinkText}>Profil & Abzeichen ansehen →</Text>
       </Pressable>
 
+      <Pressable style={styles.alphabetCard} onPress={() => navigate({ screen: "alphabet" })}>
+        <Text style={styles.alphabetCardTitle}>📖 Arabisches Alphabet</Text>
+        <Text style={styles.alphabetCardSubtitle}>
+          Buchstaben, Schreibformen und Vokalzeichen — die Grundlage, um Verse überhaupt lesen zu können.
+        </Text>
+      </Pressable>
+
       {dueReviews.length > 0 && (
         <View style={styles.reviewBanner}>
           <Text style={styles.reviewBannerText}>
@@ -61,6 +68,16 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, padding: spacing.md },
   profileLink: { marginBottom: spacing.md },
   profileLinkText: { color: colors.accent, fontWeight: "600" },
+  alphabetCard: {
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.accent,
+  },
+  alphabetCardTitle: { color: colors.text, fontWeight: "700", fontSize: 16 },
+  alphabetCardSubtitle: { color: colors.textMuted, marginTop: spacing.xs, fontSize: 13 },
   reviewBanner: {
     backgroundColor: colors.primaryDark,
     borderRadius: radius.md,

@@ -59,6 +59,13 @@ koran-app/
    `ReviewCard` mit Intervall, Ease-Factor und Fälligkeitsdatum.
 5. **Gamification** (`packages/shared/src/gamification.ts`): XP, Level
    (wachsende Schwellen), tägliche Streaks, Abzeichen.
+6. **Arabisches Alphabet als Lese-Referenz** (`packages/shared/src/alphabet.ts`,
+   `apps/mobile/src/screens/AlphabetScreen.tsx`): alle 28 Buchstaben mit ihren
+   vier Schreibformen (isoliert/Anfang/Mitte/Ende), plus Hamza-Varianten,
+   Ta marbuta, Alif maqsura und die Kurzvokal-Zeichen (Harakat) — ohne die
+   lässt sich vokalisierter Quran-Text wie in dieser App nicht lesen. Von der
+   Startseite aus prominent verlinkt, bewusst außerhalb des Lektions-/SRS-Systems
+   gehalten, weil es eine Lese-Referenz ist, kein Vokabel-Item.
 
 ## Aussprache-Bewertung: was echt ist und was nicht
 

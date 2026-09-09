@@ -19,7 +19,8 @@ export type Route =
       newlyEarnedBadges: Badge[];
     }
   | { screen: "quiz"; lessonId: string }
-  | { screen: "profile" };
+  | { screen: "profile" }
+  | { screen: "alphabet" };
 
 interface NavigationContextValue {
   route: Route;

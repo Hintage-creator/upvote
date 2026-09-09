@@ -43,6 +43,35 @@ export type LessonItemRef =
   | { type: "verse"; id: string }
   | { type: "vocab"; id: string };
 
+/**
+ * One letter of the Arabic script, with the four shapes it can take
+ * depending on position in a word (isolated/initial/medial/final).
+ * A non-connecting letter (alif, dal, dhal, ra, zay, waw) never joins to the
+ * letter that follows it, so its initial/medial shapes equal its final shape.
+ */
+export interface ArabicLetter {
+  id: string;
+  name: string; // Arabic name of the letter, e.g. "بَاء"
+  isolated: string;
+  initial: string;
+  medial: string;
+  final: string;
+  transliteration: string;
+  soundDe: string;
+  connectsForward: boolean;
+}
+
+/** A non-letter reading sign: hamza forms, ta marbuta, alif maqsura, or a harakat (short vowel mark). */
+export interface ArabicSign {
+  id: string;
+  symbol: string;
+  name: string;
+  transliteration: string;
+  soundDe: string;
+  /** A short example showing the sign attached to a letter, e.g. "بَ" for fatha on ba. */
+  example?: string;
+}
+
 export interface Lesson {
   id: string;
   title: string;
