@@ -189,6 +189,19 @@ verarbeitet mit Pillow (Python), Skript nicht Teil des Repos:
   Formen (korrektes komplexes Text-Shaping über die eingebettete Schriftart),
   Wortgrenzen bei mehrwortigen Phrasen stimmen mit der lateinischen Vorlage
   überein.
+- **Pfoten-Pfad statt Kartenliste** auf dem Kurs-Screen (`CourseListScreen` +
+  neue `PawNode`-Komponente): ein Duolingo-artiger, geschwungener Pfad aus
+  Katzenpfoten-Icons statt der flachen Lektionsliste. Pro Lektion füllen sich
+  die vier Zehen und der Ballen der Pfote (5 Segmente) proportional zum Anteil
+  der in dieser Lektion bereits im Quiz abgefragten Vokabeln/Phrasen mit Ruß
+  (schwarz statt beige) — Datenquelle ist die ohnehin pro Item gespeicherte
+  `ReviewState` aus dem SRS-System, kein neues Speicherformat nötig. Gesperrte
+  Lektionen zeigen ein wackelndes Schloss, die aktuell spielbare Lektion einen
+  pulsierenden Ring. Per Playwright geprüft: Pfad rendert korrekt, Tippen auf
+  Icon oder Titel öffnet die Lektion (ein erster Implementierungsversuch hatte
+  hier einen Bug — nur das Icon, nicht der Titeltext, war antippbar — wurde
+  gefunden und behoben), und nach drei teilweise beantworteten Quizfragen
+  füllen sich sichtbar zwei der fünf Pfoten-Segmente schwarz.
 
 ## Was nicht verifiziert wurde
 
@@ -226,6 +239,29 @@ Playwright-gesteuerten Headless-Chromium. **Nicht** getestet:
   `src/data/languages/mnk/README.md` für die genaue Liste offener Punkte
   (Ton-Diakritika in N'Ko fehlen bewusst, Wortschatz ist Bambara-nah statt
   Guinea-Maninka-spezifisch verifiziert, einige N'Ko-Zusatzbuchstaben fehlen).
+- **Web-Recherche nach zusätzlichen Quellen wurde versucht, aber die
+  Sandbox blockiert den Zugriff auf praktisch jede externe Domain**
+  (bestätigtes Muster in dieser Umgebung: ngrok- und Cloudflare-Tunnel,
+  jetzt auch `WebFetch`/`curl` auf ankataa.com, Wikipedia, Omniglot,
+  r12a.github.io — alle mit „egress blocked"/„CONNECT tunnel failed,
+  response 403"). Die Websuche selbst lieferte nur kurze Snippets, keine
+  vollständigen Seiten, daher wurden **keine** Vokabeln aus diesen Snippets
+  in den Content-Pack übernommen — das hätte bedeutet, Zitate zu erfinden,
+  die ich nie wirklich gelesen habe. Konkret identifizierte, potenziell
+  brauchbare Quellen für eine spätere Session mit funktionierendem
+  Internetzugriff (oder für manuelles Copy-Paste durch eine Person mit
+  Zugriff):
+  - An ka taa (ankataa.com) — Maninka/Malinké-Grußformeln, ~500 Vokabeln,
+    20-Kapitel-Kurs mit Audio/Video.
+  - Peace Corps „Malinke Introductory Book – Learner's Guide" (PDF, über
+    livelingua.com bzw. fsi-languages.yojik.eu gespiegelt).
+  - Omniglot-Seiten zu Maninka-Zahlen und -Schrift (omniglot.com).
+  - Wikipedia „N'Ko script" und „Maninka language" für Schriftsystem-Fakten.
+  - r12a.github.io N'Ko-Orthografie-Notizen (technische Unicode-Referenz).
+  - Die drei/vier vom Nutzer fotografierten Seiten eines gedruckten
+    N'Ko-Lehrbuchs — Titel/Verlag bisher nicht bekannt, N'Ko-Handschrift aus
+    Fotos zuverlässig zu lesen ist außerhalb dessen, was ich mit
+    verifizierbarer Genauigkeit leisten kann (siehe Chat-Verlauf).
 - Deutlich mehr Lektionen/Wortschatz — der Prototyp deckt bewusst nur so viel
   ab, wie nötig ist, um Architektur und Kernfunktionen zu zeigen.
 - Audio-Aufnahmen + Player-UI (Datenmodell ist vorbereitet, siehe oben).

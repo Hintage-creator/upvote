@@ -28,6 +28,13 @@ export function phrasesByIds(pack: LanguagePack, ids: string[]): PhraseItem[] {
   return ids.map((id) => byId.get(id)).filter((p): p is PhraseItem => p !== undefined);
 }
 
+/** All vocab + phrase item ids a lesson quizzes on, in section order. */
+export function lessonItemIds(lesson: Lesson): string[] {
+  const vocabIds = lesson.sections.filter((s) => s.type === 'vocab' || s.type === 'alphabet').flatMap((s) => s.itemIds);
+  const phraseIds = lesson.sections.filter((s) => s.type === 'phrases').flatMap((s) => s.itemIds);
+  return [...vocabIds, ...phraseIds];
+}
+
 export function phrasesByCategory(pack: LanguagePack): Map<string, PhraseItem[]> {
   const map = new Map<string, PhraseItem[]>();
   for (const phrase of pack.phraseItems) {

@@ -3,7 +3,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Animated, StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { getLanguagePack } from '../../data/languages';
-import { lessonById, phrasesByIds, vocabByIds } from '../../data/contentLookup';
+import { lessonById, lessonItemIds, phrasesByIds, vocabByIds } from '../../data/contentLookup';
 import { CourseStackParamList } from '../../navigation/types';
 import { ScriptText } from '../script/ScriptText';
 import { buildQuiz, checkTranslationAnswer } from './quizGenerator';
@@ -32,9 +32,8 @@ export function QuizScreen({ route, navigation }: Props) {
 
   const items = useMemo(() => {
     if (!lesson) return [];
-    const vocabIds = lesson.sections.filter((s) => s.type === 'vocab' || s.type === 'alphabet').flatMap((s) => s.itemIds);
-    const phraseIds = lesson.sections.filter((s) => s.type === 'phrases').flatMap((s) => s.itemIds);
-    return [...vocabByIds(pack, vocabIds), ...phrasesByIds(pack, phraseIds)];
+    const ids = lessonItemIds(lesson);
+    return [...vocabByIds(pack, ids), ...phrasesByIds(pack, ids)];
   }, [lesson]);
 
   const questions = useMemo(() => buildQuiz(items, pack.vocabItems, 'mnk', 'de'), [items]);
