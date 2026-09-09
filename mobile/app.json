@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Malinke lernen",
-    "slug": "malinke-lernapp",
+    "name": "Kungbäkola",
+    "slug": "kungbaekola",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,7 +11,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#8C580D",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

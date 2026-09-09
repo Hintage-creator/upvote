@@ -1,17 +1,21 @@
 import React, { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { progressRepository } from './index';
 import { UserProgress, xpToNextLevel } from './srs';
 import { getLanguagePack } from '../../data/languages';
+import { CatAvatar } from '../dungeon/CatAvatar';
+import { computeSootStage, SOOT_STAGE_LABELS_DE } from '../dungeon/dungeon';
+import { StoryScreen } from '../dungeon/StoryScreen';
 
 const pack = getLanguagePack('mnk');
 
 export function ProgressScreen() {
   const [progress, setProgress] = useState<UserProgress | null>(null);
   const [dueCount, setDueCount] = useState(0);
-  const [completedCount, setCompletedCount] = useState(0);
+  const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
+  const [storyVisible, setStoryVisible] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -25,7 +29,7 @@ export function ProgressScreen() {
         if (cancelled) return;
         setProgress(userProgress);
         setDueCount(dueStates.length);
-        setCompletedCount(completedLessons.length);
+        setCompletedLessonIds(completedLessons);
       }
       load();
       return () => {
@@ -44,10 +48,20 @@ export function ProgressScreen() {
 
   const { currentLevel, xpIntoLevel, xpNeededForNext } = xpToNextLevel(progress.xp);
   const levelProgressRatio = xpNeededForNext > 0 ? xpIntoLevel / xpNeededForNext : 0;
+  const sootStage = computeSootStage(completedLessonIds, pack.lessons.length);
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.header}>Fortschritt</Text>
+      <View style={styles.avatarRow}>
+        <CatAvatar sootStage={sootStage} size={88} />
+        <View style={styles.avatarTextBlock}>
+          <Text style={styles.header}>Kungbäkola</Text>
+          <Text style={styles.sootLabel}>{SOOT_STAGE_LABELS_DE[sootStage]} vom Pyramidenstaub</Text>
+          <Pressable onPress={() => setStoryVisible(true)}>
+            <Text style={styles.storyLink}>Geschichte noch einmal ansehen</Text>
+          </Pressable>
+        </View>
+      </View>
 
       <View style={styles.row}>
         <StatCard label="Streak" value={`${progress.currentStreak} 🔥`} sub={`Bestwert: ${progress.longestStreak}`} />
@@ -55,7 +69,7 @@ export function ProgressScreen() {
       </View>
       <View style={styles.row}>
         <StatCard label="Fällige Wiederholungen" value={String(dueCount)} sub="warten auf dich" />
-        <StatCard label="Lektionen gelernt" value={String(completedCount)} sub={`von ${pack.lessons.length}`} />
+        <StatCard label="Kammern gelöst" value={String(completedLessonIds.length)} sub={`von ${pack.lessons.length}`} />
       </View>
 
       <View style={styles.levelBarTrack}>
@@ -66,11 +80,15 @@ export function ProgressScreen() {
         <View style={styles.dueBlock}>
           <Text style={styles.dueTitle}>Bereit zur Wiederholung</Text>
           <Text style={styles.dueText}>
-            Öffne eine Lektion und starte das Quiz erneut — fällige Vokabeln werden dabei automatisch
+            Öffne eine Kammer und löse das Rätsel erneut — fällige Vokabeln werden dabei automatisch
             wiederholt.
           </Text>
         </View>
       ) : null}
+
+      <Modal visible={storyVisible} animationType="slide" onRequestClose={() => setStoryVisible(false)}>
+        <StoryScreen onDone={() => setStoryVisible(false)} buttonLabel="Schließen" />
+      </Modal>
     </ScrollView>
   );
 }
@@ -88,7 +106,11 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub: st
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   content: { padding: 16, paddingBottom: 32 },
-  header: { fontSize: 26, fontWeight: '700', color: colors.text, marginBottom: 16 },
+  avatarRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 20 },
+  avatarTextBlock: { flex: 1 },
+  header: { fontSize: 24, fontWeight: '700', color: colors.text },
+  sootLabel: { fontSize: 13, color: colors.textMuted, marginTop: 2 },
+  storyLink: { fontSize: 12, color: colors.primaryDark, fontWeight: '600', marginTop: 6, textDecorationLine: 'underline' },
   row: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   statCard: {
     flex: 1,

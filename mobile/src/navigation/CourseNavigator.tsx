@@ -17,9 +17,9 @@ export function CourseNavigator() {
         headerTitleStyle: { fontWeight: '700' },
       }}
     >
-      <Stack.Screen name="CourseList" component={CourseListScreen} options={{ title: 'Grundkurs' }} />
-      <Stack.Screen name="Lesson" component={LessonScreen} options={{ title: 'Lektion' }} />
-      <Stack.Screen name="Quiz" component={QuizScreen} options={{ title: 'Quiz' }} />
+      <Stack.Screen name="CourseList" component={CourseListScreen} options={{ title: 'Die Pyramide' }} />
+      <Stack.Screen name="Lesson" component={LessonScreen} options={{ title: 'Kammer' }} />
+      <Stack.Screen name="Quiz" component={QuizScreen} options={{ title: 'Rätsel' }} />
     </Stack.Navigator>
   );
 }

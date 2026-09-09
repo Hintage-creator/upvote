@@ -15,6 +15,8 @@ type Props = NativeStackScreenProps<CourseStackParamList, 'Quiz'>;
 
 const pack = getLanguagePack('mnk');
 const XP_PER_CORRECT_ANSWER = 5;
+/** Minimum score to "solve the room's riddle" and unlock the next chamber. */
+const PASS_RATIO = 0.6;
 
 export function QuizScreen({ route, navigation }: Props) {
   const { lessonId } = route.params;
@@ -78,6 +80,9 @@ export function QuizScreen({ route, navigation }: Props) {
     if (index + 1 >= questions.length) {
       const progress = await progressRepository.getUserProgress();
       await progressRepository.saveUserProgress(recordActivity(progress));
+      if (correctCount / questions.length >= PASS_RATIO) {
+        await progressRepository.markLessonCompleted(lessonId);
+      }
       setFinished(true);
       return;
     }
@@ -88,14 +93,20 @@ export function QuizScreen({ route, navigation }: Props) {
   }
 
   if (finished) {
+    const passed = correctCount / questions.length >= PASS_RATIO;
     return (
       <View style={styles.screen}>
-        <Text style={styles.resultTitle}>Quiz beendet</Text>
+        <Text style={styles.resultTitle}>{passed ? 'Rätsel gelöst!' : 'Noch nicht ganz…'}</Text>
         <Text style={styles.resultScore}>
           {correctCount} / {questions.length} richtig
         </Text>
+        <Text style={styles.resultMessage}>
+          {passed
+            ? 'Ein Steinblock gleitet zur Seite — der Weg in die nächste Kammer ist frei.'
+            : `Kungbäkola braucht mindestens ${Math.ceil(questions.length * PASS_RATIO)} richtige Antworten, um diese Kammer zu knacken. Versuch es noch einmal!`}
+        </Text>
         <Pressable style={styles.primaryButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.primaryButtonText}>Zurück zur Lektion</Text>
+          <Text style={styles.primaryButtonText}>Zurück zur Kammer</Text>
         </Pressable>
       </View>
     );
@@ -209,5 +220,6 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: { color: '#fff', fontWeight: '700' },
   resultTitle: { fontSize: 24, fontWeight: '700', color: colors.text, marginTop: 40 },
-  resultScore: { fontSize: 18, color: colors.textMuted, marginTop: 8, marginBottom: 24 },
+  resultScore: { fontSize: 18, color: colors.textMuted, marginTop: 8 },
+  resultMessage: { fontSize: 14, color: colors.text, marginTop: 12, marginBottom: 24, lineHeight: 20 },
 });

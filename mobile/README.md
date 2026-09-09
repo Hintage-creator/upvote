@@ -1,10 +1,14 @@
-# Malinke lernen — Prototyp
+# Kungbäkola — Prototyp
 
 Mobile Lern-App (Expo / React Native / TypeScript) für Malinke (Maninka,
-Guinea), gebaut für die afrikanische Diaspora in Europa. Architektur ist von
-Anfang an so ausgelegt, dass weitere Manding-Varietäten (Bambara, Dyula) und
-später Audio-Aufnahmen ergänzt werden können, ohne Typen, Screens oder
-Quiz-/Fortschritts-Logik anzufassen.
+Guinea), gebaut für die afrikanische Diaspora in Europa. Verpackt als
+Geschichte: Kungbäkola, eine streunende Katze, gerät in eine Pyramide, deren
+Tür sich hinter ihr schließt — nur wer die Rätsel (= Lektionen/Quiz) in den
+Kammern der Pyramide löst, kommt tiefer und irgendwann wieder heraus.
+Architektur ist von Anfang an so ausgelegt, dass weitere Manding-Varietäten
+(Bambara, Dyula) und später Audio-Aufnahmen ergänzt werden können, ohne
+Typen, Screens oder Quiz-/Fortschritts-Logik anzufassen — die Dungeon-Story
+ist eine reine UI-Schicht darüber, kein Teil des Sprachinhalt-Datenmodells.
 
 **Aktueller Stand ist ein funktionierender Prototyp, kein fertiges Produkt.**
 Siehe „Was noch fehlt“ unten — insbesondere: **alle Sprachinhalte sind
@@ -26,16 +30,20 @@ mobile/
     features/
       script/                   ScriptText (Latein/N'Ko-Anzeige), Umschalt-Control,
                                  ReviewBadge, geteilter Anzeige-Modus-Context
-      course/                   Kursübersicht + Lektionsdetail
+      course/                   Kursübersicht ("Pyramide") + Lektionsdetail ("Kammer")
       phrasebook/                Phrasenbuch-Screen
-      quiz/                     Quiz-Generator (reine Funktionen) + Quiz-Screen
+      quiz/                     Quiz-Generator (reine Funktionen) + Quiz-Screen ("Rätsel")
       progress/                 SM-2-Wiederholungsalgorithmus, Streaks/XP/Level,
                                  Storage-Repository, Fortschritts-Screen
+      dungeon/                  Story-Framing: Ruß-Stufen-Logik, CatAvatar,
+                                 Intro-/Backstory-Screen — reine UI-Schicht über
+                                 Unit/Lesson, kein Teil des Sprachinhalt-Modells
     services/
       keyValueStore.ts          Store-Interface + In-Memory-Implementierung (Tests)
       asyncStorageAdapter.ts    AsyncStorage-Implementierung des Interfaces
     navigation/                 React-Navigation-Verdrahtung (Tabs + Stack)
-  __tests__/                    Jest-Tests für SM-2, Fortschritts-Repository, Quiz-Generator
+  assets/mascot/                Aus dem User-Konzept abgeleitete Bild-Assets (siehe unten)
+  __tests__/                    Jest-Tests für SM-2, Fortschritts-Repository, Quiz-Generator, Dungeon
 ```
 
 ### Warum diese Architektur
@@ -74,6 +82,16 @@ mobile/
 - **Quiz-Fragen werden aus dem Vokabular generiert**, nicht von Hand
   gepflegt (`quizGenerator.ts`, reine, injizierbare-RNG-testbare Funktionen).
   Multiple-Choice-Distraktoren kommen aus dem restlichen Sprachpaket.
+- **Die Dungeon-Story ist eine UI-Schicht, kein Content-Feature**: Kammern
+  (`Unit`) und Räume (`Lesson`) existieren technisch unabhängig von der
+  Geschichte. `src/features/dungeon/dungeon.ts` liefert zwei reine, getestete
+  Funktionen darüber: `isLessonUnlocked` (linearer Pfad — ein Raum ist erst
+  offen, wenn der vorherige gelöst ist) und `computeSootStage` (Ruß-Stufe
+  0–4 aus gelösten Räumen / Gesamtzahl). Ein Rätsel gilt als „gelöst“, wenn
+  im Quiz mindestens 60 % der Fragen richtig beantwortet wurden
+  (`QuizScreen.PASS_RATIO`) — erst dann wird die nächste Kammer freigeschaltet.
+  Weil das komplett unabhängig vom Sprachinhalt ist, funktioniert es später
+  auch für Bambara/Dyula-Kurse ohne Änderung.
 
 ## Setup & Ausführen
 
@@ -86,15 +104,44 @@ npm start           # Expo-Dev-Server (Metro) — Scannen mit Expo Go, oder
 npm run android / npm run ios / npm run web
 ```
 
+## Bild-Assets: Herkunft und Verarbeitung
+
+Alle Bild-Assets unter `assets/` (App-Icon, Katzen-Avatar, Story-
+Illustrationen) stammen aus den vom Nutzer bereitgestellten Konzeptbildern
+("Original-Konzept", "App-Symbol", "Logo-Entwurf/-Enthüllung"). Konkret
+verarbeitet mit Pillow (Python), Skript nicht Teil des Repos:
+
+- `assets/icon.png` / `android-icon-foreground.png` / `favicon.png` /
+  `splash-icon.png`: direkter Zuschnitt der "App-Symbol"-Kachel aus der
+  Vorlage, hochskaliert. **Kein sauberes Alpha-Matte-Icon** — für ein
+  pixelgenaues Android-Adaptive-Icon (transparenter Hintergrund, korrektes
+  Padding für die System-Maskierung) sollte später ein echter Icon-Export
+  aus dem Original-Design nachgereicht werden.
+- `assets/mascot/soot-0.png` … `soot-4.png`: dieselbe Icon-Kachel,
+  programmatisch mit zunehmender Entsättigung + Abdunkelung + leichtem
+  Korn-Rauschen zu einer "Ruß"-Stufe verarbeitet (siehe `CatAvatar.tsx`).
+  Das sind **keine zusätzlichen handgezeichneten Varianten** — falls später
+  echte Illustrationen für jede Stufe entstehen, ersetzen sie einfach diese
+  Dateien 1:1.
+- `assets/mascot/story-standing.png` / `story-lying.png`: Zuschnitt der
+  "Stehend – Vorderansicht" bzw. "Liegend – Vorderansicht"-Kacheln aus dem
+  Original-Konzeptbild, unverändert.
+- `android-icon-background.png`: einfarbige Fläche in der dominanten
+  Goldfarbe des Icons (kein Bild-Zuschnitt).
+- `android-icon-monochrome.png` ist **noch der ungeänderte Platzhalter aus
+  dem Expo-Template** — für Android-13-Themed-Icons fehlt noch eine echte
+  Silhouette/Alpha-Maske.
+
 ## Was funktioniert (verifiziert)
 
 - `npm run typecheck` läuft ohne Fehler über den gesamten `src/`-Code.
-- `npm test`: 22 Jest-Tests für SM-2-Terminplanung, Streaks/XP/Level,
-  Storage-Repository und Quiz-Generierung — alle grün.
+- `npm test`: 31 Jest-Tests (SM-2-Terminplanung, Streaks/XP/Level,
+  Storage-Repository, Quiz-Generierung, Dungeon-Logik) — alle grün.
 - Grundkurs-Struktur mit aufsteigendem Schwierigkeitsgrad (Alphabet → Zahlen
   → Pronomen/Grammatik → Begrüßungen), zweisprachige Latein/N'Ko-Darstellung
   mit Umschalter, Phrasenbuch, Multiple-Choice- und Übersetzungs-Quiz,
-  Fortschritts-Screen mit Streak/Level/fälligen Wiederholungen.
+  Fortschritts-Screen mit Streak/Level/fälligen Wiederholungen, Story-Intro
+  und Ruß-Avatar/Raum-Sperre als Dungeon-Rahmen.
 
 ## Was nicht verifiziert wurde
 
@@ -119,7 +166,9 @@ Typecheck und Logik-Tests. Vor dem ersten echten Einsatz bitte:
 - Audio-Aufnahmen + Player-UI (Datenmodell ist vorbereitet, siehe oben).
 - Nutzer-Accounts / Cloud-Sync des Fortschritts (aktuell rein lokal auf dem
   Gerät via AsyncStorage).
-- App-Icons/Splash-Screen (Platzhalter-Assets aus dem Expo-Template).
+- Sauberes Alpha-Matte-App-Icon und Android-Monochrome-Icon (siehe Abschnitt
+  „Bild-Assets" oben) — aktuell ein direkter Zuschnitt der Vorlage, kein
+  eigens für App-Icon-Anforderungen exportiertes Asset.
 
 ## Weitere Manding-Varietät ergänzen (z. B. Bambara)
 

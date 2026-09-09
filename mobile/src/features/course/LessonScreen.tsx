@@ -109,14 +109,14 @@ export function LessonScreen({ route, navigation }: Props) {
 
       <View style={styles.actions}>
         <Pressable style={styles.completeButton} onPress={markCompleted}>
-          <Text style={styles.completeButtonText}>{completed ? 'Als gelernt markiert ✓' : 'Als gelernt markieren'}</Text>
+          <Text style={styles.completeButtonText}>{completed ? 'Kammer studiert ✓' : 'Als studiert markieren'}</Text>
         </Pressable>
         {hasQuizzableContent ? (
           <Pressable
             style={styles.quizButton}
             onPress={() => navigation.navigate('Quiz', { lessonId })}
           >
-            <Text style={styles.quizButtonText}>Quiz starten</Text>
+            <Text style={styles.quizButtonText}>Rätsel lösen</Text>
           </Pressable>
         ) : null}
       </View>

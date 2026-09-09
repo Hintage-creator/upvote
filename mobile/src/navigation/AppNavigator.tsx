@@ -11,9 +11,9 @@ import { colors } from '../theme/colors';
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 const TAB_ICONS: Record<keyof RootTabParamList, string> = {
-  CourseTab: '📖',
+  CourseTab: '🔺',
   Phrasebook: '💬',
-  Progress: '📈',
+  Progress: '🐾',
 };
 
 export function AppNavigator() {
@@ -27,9 +27,9 @@ export function AppNavigator() {
           tabBarIcon: () => <Text style={{ fontSize: 18 }}>{TAB_ICONS[route.name]}</Text>,
         })}
       >
-        <Tab.Screen name="CourseTab" component={CourseNavigator} options={{ title: 'Kurs' }} />
+        <Tab.Screen name="CourseTab" component={CourseNavigator} options={{ title: 'Pyramide' }} />
         <Tab.Screen name="Phrasebook" component={PhrasebookScreen} options={{ title: 'Phrasen' }} />
-        <Tab.Screen name="Progress" component={ProgressScreen} options={{ title: 'Fortschritt' }} />
+        <Tab.Screen name="Progress" component={ProgressScreen} options={{ title: 'Kungbäkola' }} />
       </Tab.Navigator>
     </NavigationContainer>
   );
