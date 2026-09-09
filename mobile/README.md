@@ -159,6 +159,16 @@ verarbeitet mit Pillow (Python), Skript nicht Teil des Repos:
 - `android-icon-monochrome.png` ist **noch der ungeänderte Platzhalter aus
   dem Expo-Template** — für Android-13-Themed-Icons fehlt noch eine echte
   Silhouette/Alpha-Maske.
+- `assets/video/intro.mp4`: vom Nutzer mit Gemini/Veo erzeugter Cutscene-Clip
+  (Wüstenlauf → Pyramideneingang → Kungbäkola-Logo-Reveal), unverändert
+  übernommen. Läuft als überspringbares Intro vor dem Story-Screen (siehe
+  `IntroVideoScreen.tsx`) — Konzept wie das Studio-Logo-Intro in Shadow
+  Fight: läuft bei jedem Kaltstart, nicht nur beim ersten Mal, per Tap auf
+  „Überspringen" jederzeit überspringbar, Ton ist standardmäßig stumm mit
+  Umschalter. Falls das Video auf einem Gerät/Browser nicht dekodiert werden
+  kann, fängt ein `statusChange`-Listener den Fehlerzustand ab und
+  schaltet automatisch weiter, statt auf einem schwarzen Bild hängen zu
+  bleiben.
 
 ## Was funktioniert (verifiziert)
 
@@ -195,6 +205,19 @@ Playwright-gesteuerten Headless-Chromium. **Nicht** getestet:
    nicht gezielt korrekt) — der Code-Pfad ist einfach genug, um ihn auf
    dieselbe, bereits geprüfte Animations-Grundlage (Opacity/Scale via
    `Animated`) zu stützen, aber visuell nicht extra bestätigt.
+3. **Die tatsächliche Videowiedergabe von `intro.mp4`** konnte in dieser
+   Sandbox nicht bestätigt werden: Das hier verfügbare Headless-Chromium
+   (Playwright-Build) hat schlicht keinen H.264/AAC-Codec einkompiliert
+   (`canPlayType` liefert für H.264/AAC leer, nur VP8/VP9/AV1 laufen) — jeder
+   reguläre Browser (Chrome, Safari, Firefox, Edge) sowie native iOS/Android
+   über die Plattform-Decoder unterstützen H.264/AAC-MP4 aber standardmäßig.
+   Verifiziert wurde nur die Verdrahtung drumherum: `<video>`-Element mit
+   korrektem `src`/`muted`, die Event-Listener (`playToEnd`,
+   `statusChange`) feuern nachweislich, und der Skip-Button sowie der
+   automatische Fallback bei einem Decode-Fehler navigieren beide korrekt
+   zum Story-Screen weiter. Vor dem ersten echten Release bitte einmal in
+   einem normalen Browser bzw. auf einem echten Gerät gegenchecken, dass
+   das Video tatsächlich sichtbar abspielt.
 
 ## Was inhaltlich vor Produktivbetrieb fehlt
 

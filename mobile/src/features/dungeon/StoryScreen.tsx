@@ -17,9 +17,9 @@ const PARAGRAPHS = [
 ];
 
 /**
- * The framing story, shown once before the pyramid opens (and replayable
- * from the Progress tab). Illustration is the user-supplied "standing"
- * concept artwork, used as-is.
+ * The narrative detail screen, shown right after the skippable intro video
+ * (IntroVideoScreen) on first launch, and replayable from the Progress tab.
+ * Illustration is the user-supplied "standing" concept artwork.
  */
 export function StoryScreen({ onDone, buttonLabel = 'Die Pyramide betreten' }: Props) {
   return (

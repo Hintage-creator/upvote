@@ -7,13 +7,17 @@ import { AppNavigator } from './src/navigation/AppNavigator';
 import { ScriptDisplayModeProvider } from './src/features/script/ScriptDisplayModeContext';
 import { ContentDisclaimerBanner } from './src/features/ContentDisclaimerBanner';
 import { StoryScreen } from './src/features/dungeon/StoryScreen';
+import { IntroVideoScreen } from './src/features/dungeon/IntroVideoScreen';
 import { hasSeenStory, markStorySeen } from './src/features/dungeon/storyProgress';
 import { CatAvatar } from './src/features/dungeon/CatAvatar';
 import { colors } from './src/theme/colors';
 
+type Stage = 'intro' | 'story' | 'app';
+
 export default function App() {
   const [fontsLoaded] = useFonts({ NotoSansNKo_400Regular });
   const [storySeen, setStorySeen] = useState<boolean | null>(null);
+  const [stage, setStage] = useState<Stage>('intro');
 
   useEffect(() => {
     hasSeenStory().then(setStorySeen);
@@ -28,22 +32,29 @@ export default function App() {
     );
   }
 
+  function finishIntro() {
+    setStage(storySeen ? 'app' : 'story');
+  }
+
   async function enterPyramid() {
     await markStorySeen();
     setStorySeen(true);
+    setStage('app');
   }
 
   return (
     <SafeAreaProvider>
       <ScriptDisplayModeProvider>
         <View style={styles.root}>
-          {storySeen ? (
+          {stage === 'intro' ? (
+            <IntroVideoScreen onDone={finishIntro} />
+          ) : stage === 'story' ? (
+            <StoryScreen onDone={enterPyramid} />
+          ) : (
             <>
               <ContentDisclaimerBanner />
               <AppNavigator />
             </>
-          ) : (
-            <StoryScreen onDone={enterPyramid} />
           )}
         </View>
       </ScriptDisplayModeProvider>
