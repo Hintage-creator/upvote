@@ -1,0 +1,736 @@
+<title>Koran-Lernapp</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&family=Scheherazade+New:wght@400;700&display=swap">
+<style>
+  :root{
+    --bg:#0b1220;
+    --surface:#141d2e;
+    --surface-alt:#1c2740;
+    --border:#24314a;
+    --text:#eef2f7;
+    --text-muted:#8fa0ba;
+    --primary:#2fae65;
+    --primary-dark:#1f7f49;
+    --primary-ink:#052e1b;
+    --accent:#d9a441;
+    --accent-ink:#2b1c02;
+    --danger:#e6584f;
+    --font-ui: "Work Sans", -apple-system, "Segoe UI", sans-serif;
+    --font-ar: "Scheherazade New", "Traditional Arabic", serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-ui);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:28px 16px 60px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(30deg, transparent 48%, rgba(217,164,65,.05) 49%, rgba(217,164,65,.05) 51%, transparent 52%),
+      linear-gradient(-30deg, transparent 48%, rgba(47,174,101,.05) 49%, rgba(47,174,101,.05) 51%, transparent 52%);
+    background-size: 84px 84px;
+    pointer-events:none;
+    z-index:0;
+  }
+  .shell{ position:relative; z-index:1; width:100%; max-width:428px; }
+  .shell-label{
+    text-align:center;
+    color:var(--text-muted);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  .phone{
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:28px;
+    box-shadow:0 30px 70px rgba(0,0,0,.55), 0 0 0 6px rgba(255,255,255,.02) inset;
+    overflow:hidden;
+  }
+  .phone-inner{
+    height:min(830px, 82vh);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:18px 16px 32px;
+    scrollbar-width:thin;
+  }
+  .notice{
+    margin-top:14px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px 14px;
+    color:var(--text-muted);
+    font-size:12px;
+    line-height:1.5;
+  }
+  h1,h2,h3{ font-family:var(--font-ui); text-wrap:balance; margin:0; }
+  p{ margin:0; }
+  button{ font-family:var(--font-ui); cursor:pointer; border:none; }
+  button:focus-visible, a:focus-visible, [tabindex]:focus-visible{
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+  .arabic{ font-family:var(--font-ar); direction:rtl; }
+
+  .back-link{ background:none; color:var(--accent); font-size:14px; font-weight:600; padding:4px 0 14px; }
+
+  .stats-card{
+    background:var(--surface); border-radius:14px; padding:16px; margin-bottom:12px;
+  }
+  .stats-row{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+  .stats-level{ font-weight:700; font-size:16px; }
+  .stats-streak{ color:var(--accent); font-weight:600; font-size:14px; }
+  .xp-track{ height:8px; border-radius:4px; background:var(--surface-alt); overflow:hidden; }
+  .xp-fill{ height:100%; background:var(--primary); transition:width .4s ease; }
+  .xp-label{ color:var(--text-muted); font-size:12px; margin-top:6px; font-variant-numeric:tabular-nums; }
+
+  .link-row{ color:var(--accent); font-weight:600; font-size:14px; background:none; padding:6px 0; margin-bottom:8px; text-align:left; }
+
+  .alphabet-card{
+    background:var(--surface-alt); border:1px solid var(--accent); border-radius:14px;
+    padding:14px; margin-bottom:12px; text-align:left; width:100%;
+  }
+  .alphabet-card-title{ font-weight:700; font-size:15px; }
+  .alphabet-card-sub{ color:var(--text-muted); font-size:12.5px; margin-top:4px; line-height:1.4; }
+
+  .review-banner{ background:var(--primary-dark); border-radius:14px; padding:14px; margin-bottom:12px; font-weight:600; font-size:14px; }
+
+  .section-title{ font-size:18px; font-weight:700; margin:18px 0 10px; }
+  .section-sub{ color:var(--text-muted); font-size:12.5px; margin-bottom:10px; line-height:1.4; }
+
+  .lesson-card{
+    background:var(--surface); border-radius:14px; padding:14px; margin-bottom:10px; width:100%; text-align:left;
+  }
+  .lesson-title{ font-weight:700; font-size:15px; }
+  .lesson-desc{ color:var(--text-muted); font-size:13px; margin-top:4px; }
+  .lesson-meta{ color:var(--accent); font-size:11.5px; margin-top:6px; }
+
+  .item-card{ background:var(--surface); border-radius:16px; padding:18px; margin-bottom:10px; }
+  .item-ref{ color:var(--text-muted); font-size:11px; margin-bottom:6px; }
+  .item-arabic{ font-size:34px; line-height:1.6; text-align:right; margin-bottom:8px; }
+  .item-translit{ color:var(--accent); font-style:italic; font-size:15px; margin-bottom:8px; }
+  .item-translation{ color:var(--text-muted); font-size:13px; margin-bottom:2px; }
+  .play-btn{
+    margin-top:12px; width:100%; padding:10px; border-radius:9px; background:var(--surface-alt);
+    color:var(--text-muted); font-weight:600; font-size:13px; text-align:center;
+  }
+  .practice-btn{
+    width:100%; background:var(--surface-alt); color:var(--text); font-weight:600; font-size:13.5px;
+    padding:10px; border-radius:9px; margin:-2px 0 14px;
+  }
+  .primary-btn{
+    width:100%; background:var(--primary); color:var(--primary-ink); font-weight:700; font-size:14px;
+    padding:13px; border-radius:11px; margin-top:8px;
+  }
+  .primary-btn:disabled{ background:var(--surface-alt); color:var(--text-muted); }
+  .accent-btn{
+    width:100%; background:var(--accent); color:var(--accent-ink); font-weight:700; font-size:14px;
+    padding:13px; border-radius:11px; margin-top:10px;
+  }
+  .ghost-btn{
+    width:100%; background:var(--surface-alt); color:var(--text); font-weight:600; font-size:14px;
+    padding:12px; border-radius:11px; margin-top:10px;
+  }
+
+  .record-box{ background:var(--surface); border-radius:16px; padding:22px; text-align:center; margin-top:12px; }
+  .record-btn{ background:var(--primary); color:var(--primary-ink); font-weight:700; font-size:15px; padding:14px 22px; border-radius:12px; }
+  .stop-btn{ background:var(--danger); color:#2a0906; font-weight:700; font-size:15px; padding:14px 22px; border-radius:12px; }
+  .timer{ font-size:26px; font-weight:700; margin-bottom:12px; font-variant-numeric:tabular-nums; }
+  .err-text{ color:var(--danger); font-size:13px; margin-top:12px; line-height:1.5; }
+  .hint{ color:var(--text-muted); font-size:13px; text-align:center; margin-top:14px; }
+
+  .score-wrap{ text-align:center; padding-top:22px; }
+  .score-value{ font-size:60px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .score-max{ color:var(--text-muted); font-size:18px; }
+  .feedback-text{ font-size:15px; text-align:center; margin-top:12px; }
+  .disclaimer{ color:var(--text-muted); font-size:11.5px; text-align:center; margin-top:14px; line-height:1.5; }
+  .badge-box{ background:var(--surface); border-radius:12px; padding:14px; margin-top:18px; }
+  .badge-box-title{ color:var(--accent); font-weight:700; margin-bottom:6px; font-size:13.5px; }
+
+  .quiz-progress{ color:var(--text-muted); font-size:13px; margin-bottom:6px; }
+  .quiz-prompt{ font-size:16px; font-weight:600; margin-bottom:16px; white-space:pre-line; }
+  .quiz-option{
+    width:100%; background:var(--surface); color:var(--text); border-radius:11px; padding:13px;
+    margin-bottom:8px; text-align:right; font-size:14.5px; direction:rtl;
+  }
+  .quiz-option.lat{ direction:ltr; text-align:right; }
+  .quiz-option.correct{ background:var(--primary-dark); }
+  .quiz-option.wrong{ background:var(--danger); color:#2a0906; }
+  .quiz-summary{ text-align:center; padding-top:40px; }
+
+  .streak-row{ display:flex; gap:10px; margin-bottom:16px; }
+  .streak-box{ flex:1; background:var(--surface); border-radius:12px; padding:14px; text-align:center; }
+  .streak-value{ color:var(--accent); font-size:26px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .streak-label{ color:var(--text-muted); font-size:11.5px; margin-top:4px; }
+
+  .badge-grid{ display:flex; flex-direction:column; gap:8px; }
+  .badge-row{ background:var(--surface); border-radius:12px; padding:12px; display:flex; align-items:center; gap:12px; }
+  .badge-row.locked{ opacity:.5; }
+  .badge-icon{ font-size:22px; }
+  .badge-name{ font-weight:700; font-size:13.5px; }
+  .badge-desc{ color:var(--text-muted); font-size:11.5px; }
+
+  .letter-card{ background:var(--surface); border-radius:12px; padding:13px; margin-bottom:8px; }
+  .letter-head{ display:flex; justify-content:space-between; align-items:baseline; }
+  .letter-name{ font-family:var(--font-ar); font-size:19px; }
+  .letter-lit{ color:var(--accent); font-weight:700; font-size:13px; }
+  .letter-sound{ color:var(--text-muted); font-size:12px; margin:5px 0 9px; }
+  .forms-row{ display:flex; justify-content:space-between; }
+  .form-cell{ flex:1; text-align:center; }
+  .form-glyph{ font-family:var(--font-ar); font-size:24px; }
+  .form-label{ color:var(--text-muted); font-size:9.5px; margin-top:3px; }
+  .no-connect{ color:var(--text-muted); font-size:10px; font-style:italic; margin-top:7px; }
+
+  .sign-list{ background:var(--surface); border-radius:12px; overflow:hidden; margin-bottom:6px; }
+  .sign-row{ display:flex; align-items:center; gap:12px; padding:11px 13px; border-bottom:1px solid var(--border); }
+  .sign-row:last-child{ border-bottom:none; }
+  .sign-symbol{ font-family:var(--font-ar); font-size:24px; min-width:44px; text-align:center; }
+  .sign-name{ font-weight:700; font-size:13px; }
+  .sign-lit{ color:var(--accent); font-weight:400; }
+  .sign-sound{ color:var(--text-muted); font-size:11px; margin-top:1px; }
+</style>
+
+<div class="shell">
+  <div class="shell-label">Vorschau &middot; lokale Demo &middot; Fortschritt bleibt nur in diesem Browser</div>
+  <div class="phone">
+    <div class="phone-inner" id="app"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============================== DATA ==============================
+   Ported 1:1 from packages/shared/src/content.ts and alphabet.ts so the
+   preview matches the real app's content exactly. */
+
+const VERSES = [
+  { id:"1:1", surahNumber:1, surahNameLatin:"Al-Fatiha", ayahNumber:1, arabicText:"بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", transliteration:"Bismillahi r-rahmani r-rahim", translationDe:"Im Namen Allahs, des Allerbarmers, des Barmherzigen.", translationEn:"In the name of Allah, the Entirely Merciful, the Especially Merciful.", difficulty:1 },
+  { id:"1:2", surahNumber:1, surahNameLatin:"Al-Fatiha", ayahNumber:2, arabicText:"الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ", transliteration:"Alhamdu lillahi rabbi l-'alamin", translationDe:"Alles Lob gebührt Allah, dem Herrn der Welten.", translationEn:"All praise is due to Allah, Lord of the worlds.", difficulty:1 },
+  { id:"1:3", surahNumber:1, surahNameLatin:"Al-Fatiha", ayahNumber:3, arabicText:"الرَّحْمَٰنِ الرَّحِيمِ", transliteration:"Ar-rahmani r-rahim", translationDe:"Dem Allerbarmer, dem Barmherzigen.", translationEn:"The Entirely Merciful, the Especially Merciful.", difficulty:1 },
+  { id:"1:4", surahNumber:1, surahNameLatin:"Al-Fatiha", ayahNumber:4, arabicText:"مَالِكِ يَوْمِ الدِّينِ", transliteration:"Maliki yawmi d-din", translationDe:"Dem Herrscher am Tag des Gerichts.", translationEn:"Sovereign of the Day of Recompense.", difficulty:2 },
+  { id:"1:5", surahNumber:1, surahNameLatin:"Al-Fatiha", ayahNumber:5, arabicText:"إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", transliteration:"Iyyaka na'budu wa iyyaka nasta'in", translationDe:"Dir allein dienen wir, und Dich allein bitten wir um Hilfe.", translationEn:"It is You we worship and You we ask for help.", difficulty:2 },
+  { id:"1:6", surahNumber:1, surahNameLatin:"Al-Fatiha", ayahNumber:6, arabicText:"اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", transliteration:"Ihdina s-sirata l-mustaqim", translationDe:"Leite uns den geraden Weg.", translationEn:"Guide us to the straight path.", difficulty:2 },
+  { id:"1:7", surahNumber:1, surahNameLatin:"Al-Fatiha", ayahNumber:7, arabicText:"صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ", transliteration:"Sirata lladhina an'amta 'alayhim ghayri l-maghdubi 'alayhim wa la d-dallin", translationDe:"Den Weg derer, denen Du Gnade erwiesen hast, nicht derer, die Deinen Zorn erregt haben, und nicht der Irregehenden.", translationEn:"The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray.", difficulty:3 },
+  { id:"112:1", surahNumber:112, surahNameLatin:"Al-Ikhlas", ayahNumber:1, arabicText:"قُلْ هُوَ اللَّهُ أَحَدٌ", transliteration:"Qul huwa llahu ahad", translationDe:"Sag: Er ist Allah, ein Einziger.", translationEn:"Say, He is Allah, [who is] One.", difficulty:1 },
+  { id:"112:2", surahNumber:112, surahNameLatin:"Al-Ikhlas", ayahNumber:2, arabicText:"اللَّهُ الصَّمَدُ", transliteration:"Allahu s-samad", translationDe:"Allah, der Absolute, von dem alles abhängt.", translationEn:"Allah, the Eternal Refuge.", difficulty:2 },
+  { id:"112:3", surahNumber:112, surahNameLatin:"Al-Ikhlas", ayahNumber:3, arabicText:"لَمْ يَلِدْ وَلَمْ يُولَدْ", transliteration:"Lam yalid wa lam yulad", translationDe:"Er hat nicht gezeugt und ist nicht gezeugt worden.", translationEn:"He neither begets nor is born.", difficulty:2 },
+  { id:"112:4", surahNumber:112, surahNameLatin:"Al-Ikhlas", ayahNumber:4, arabicText:"وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ", transliteration:"Wa lam yakun lahu kufuwan ahad", translationDe:"Und niemand ist Ihm ebenbürtig.", translationEn:"Nor is there to Him any equivalent.", difficulty:2 },
+].map(v => ({ ...v, type:"verse", referenceAudioUrl: "https://everyayah.com/data/Alafasy_128kbps/" + String(v.surahNumber).padStart(3,"0") + String(v.ayahNumber).padStart(3,"0") + ".mp3" }));
+
+const VOCAB = [
+  { id:"v-kitab", arabicWord:"كِتَاب", transliteration:"kitab", translationDe:"Buch", translationEn:"book", difficulty:1 },
+  { id:"v-bayt", arabicWord:"بَيْت", transliteration:"bayt", translationDe:"Haus", translationEn:"house", difficulty:1 },
+  { id:"v-salam", arabicWord:"سَلَام", transliteration:"salam", translationDe:"Frieden", translationEn:"peace", difficulty:1 },
+  { id:"v-shukran", arabicWord:"شُكْرًا", transliteration:"shukran", translationDe:"danke", translationEn:"thank you", difficulty:1 },
+  { id:"v-qalam", arabicWord:"قَلَم", transliteration:"qalam", translationDe:"Stift", translationEn:"pen", difficulty:1 },
+  { id:"v-madrasa", arabicWord:"مَدْرَسَة", transliteration:"madrasa", translationDe:"Schule", translationEn:"school", difficulty:2 },
+  { id:"v-yaktubu", arabicWord:"يَكْتُبُ", transliteration:"yaktubu", translationDe:"er schreibt", translationEn:"he writes", difficulty:2 },
+  { id:"v-jamil", arabicWord:"جَمِيل", transliteration:"jamil", translationDe:"schön", translationEn:"beautiful", difficulty:2 },
+  { id:"v-min-fadlik", arabicWord:"مِنْ فَضْلِك", transliteration:"min fadlik", translationDe:"bitte", translationEn:"please", difficulty:2 },
+  { id:"v-yataallamu", arabicWord:"يَتَعَلَّمُ", transliteration:"yata'allamu", translationDe:"er lernt", translationEn:"he learns", difficulty:3 },
+  { id:"v-inshallah", arabicWord:"إِنْ شَاءَ اللَّه", transliteration:"in sha'a Allah", translationDe:"so Gott will", translationEn:"God willing", difficulty:3 },
+].map(v => ({ ...v, type:"vocab", referenceAudioUrl:null }));
+
+const VERSES_BY_ID = Object.fromEntries(VERSES.map(v => [v.id, v]));
+const VOCAB_BY_ID = Object.fromEntries(VOCAB.map(v => [v.id, v]));
+function findItem(type, id){ return type === "verse" ? VERSES_BY_ID[id] : VOCAB_BY_ID[id]; }
+
+const LESSONS = [
+  { id:"l-vocab-1", title:"Grundlagen: Erste Wörter", description:"Fünf einfache Alltagswörter auf Hocharabisch.", order:1, difficulty:1, items:["v-kitab","v-bayt","v-salam","v-shukran","v-qalam"].map(id=>({type:"vocab",id})) },
+  { id:"l-fatiha-1", title:"Al-Fatiha (1/2)", description:"Die ersten vier Verse der Eröffnungssure.", order:2, difficulty:1, items:["1:1","1:2","1:3","1:4"].map(id=>({type:"verse",id})) },
+  { id:"l-fatiha-2", title:"Al-Fatiha (2/2)", description:"Die letzten drei Verse der Eröffnungssure.", order:3, difficulty:2, items:["1:5","1:6","1:7"].map(id=>({type:"verse",id})) },
+  { id:"l-vocab-2", title:"Mehr Wörter", description:"Schule, Verben und Höflichkeitsfloskeln.", order:4, difficulty:2, items:["v-madrasa","v-yaktubu","v-jamil","v-min-fadlik"].map(id=>({type:"vocab",id})) },
+  { id:"l-ikhlas", title:"Al-Ikhlas", description:"Die kurze Sure über die Einheit Gottes.", order:5, difficulty:2, items:["112:1","112:2","112:3","112:4"].map(id=>({type:"verse",id})) },
+  { id:"l-vocab-3", title:"Fortgeschrittene Wörter", description:"Komplexere Verben und Redewendungen.", order:6, difficulty:3, items:["v-yataallamu","v-inshallah"].map(id=>({type:"vocab",id})) },
+];
+
+function resolvedLessonItems(lessonId){
+  const lesson = LESSONS.find(l => l.id === lessonId);
+  return lesson.items.map(ref => findItem(ref.type, ref.id));
+}
+
+// Quiz question generation, ported 1:1 from content.ts's buildQuizQuestions().
+function shuffle(arr){
+  const copy = arr.slice();
+  for (let i = copy.length - 1; i > 0; i--){
+    const j = Math.floor(((i + 7) * 2654435761) % (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+function pickRandomDistinct(pool, count, seedId){
+  const seed = Array.from(seedId).reduce((acc,c) => acc + c.charCodeAt(0), 0);
+  const result = []; let idx = seed; const used = new Set();
+  while (result.length < count && result.length < pool.length){
+    idx = (idx + 13) % pool.length;
+    const candidate = pool[idx];
+    if (!used.has(candidate.id)){ used.add(candidate.id); result.push(candidate); }
+  }
+  return result;
+}
+function buildQuizQuestions(){
+  const questions = [];
+  for (const lesson of LESSONS){
+    const verseIds = lesson.items.filter(i => i.type === "verse").map(i => i.id);
+    for (let i = 0; i < verseIds.length; i++){
+      const verse = VERSES_BY_ID[verseIds[i]];
+      const others = VERSES.filter(v => v.id !== verse.id);
+      const distractorsM = pickRandomDistinct(others, 3, verse.id);
+      questions.push({
+        id:"q-meaning-"+verse.id, lessonId:lesson.id, verseId:verse.id, type:"multiple_choice",
+        prompt:"Was bedeutet dieser Vers?\n"+verse.arabicText,
+        options: shuffle([verse.translationDe, ...distractorsM.map(d=>d.translationDe)]),
+        correctAnswer: verse.translationDe,
+      });
+      if (i < verseIds.length - 1){
+        const next = VERSES_BY_ID[verseIds[i+1]];
+        const distractorsC = pickRandomDistinct(others.filter(v=>v.id!==next.id), 2, verse.id);
+        questions.push({
+          id:"q-continue-"+verse.id, lessonId:lesson.id, verseId:verse.id, type:"fill_blank",
+          prompt:"Wie geht dieser Vers weiter?\n"+verse.arabicText,
+          options: shuffle([next.arabicText, ...distractorsC.map(d=>d.arabicText)]),
+          correctAnswer: next.arabicText,
+        });
+      }
+    }
+  }
+  return questions;
+}
+const QUIZ_QUESTIONS = buildQuizQuestions();
+
+// Arabic alphabet + reading signs, ported 1:1 from alphabet.ts.
+const ARABIC_ALPHABET = [
+  { id:"alif", name:"أَلِف", isolated:"ا", initial:"ا", medial:"ـا", final:"ـا", transliteration:"ā / a", soundDe:"langes „a“ wie in „Vater“; trägt oft nur den Hamza-Anlaut", connectsForward:false },
+  { id:"ba", name:"بَاء", isolated:"ب", initial:"بـ", medial:"ـبـ", final:"ـب", transliteration:"b", soundDe:"wie deutsches „b“", connectsForward:true },
+  { id:"ta", name:"تَاء", isolated:"ت", initial:"تـ", medial:"ـتـ", final:"ـت", transliteration:"t", soundDe:"wie deutsches „t“", connectsForward:true },
+  { id:"tha", name:"ثَاء", isolated:"ث", initial:"ثـ", medial:"ـثـ", final:"ـث", transliteration:"th", soundDe:"stimmloses „th“ wie engl. „think“", connectsForward:true },
+  { id:"jim", name:"جِيم", isolated:"ج", initial:"جـ", medial:"ـجـ", final:"ـج", transliteration:"j", soundDe:"wie „dsch“ in „Dschungel“", connectsForward:true },
+  { id:"ha-emphatic", name:"حَاء", isolated:"ح", initial:"حـ", medial:"ـحـ", final:"ـح", transliteration:"ḥ", soundDe:"gehauchtes „h“, tief im Rachen gebildet", connectsForward:true },
+  { id:"kha", name:"خَاء", isolated:"خ", initial:"خـ", medial:"ـخـ", final:"ـخ", transliteration:"kh", soundDe:"wie „ch“ in „Bach“", connectsForward:true },
+  { id:"dal", name:"دَال", isolated:"د", initial:"د", medial:"ـد", final:"ـد", transliteration:"d", soundDe:"wie deutsches „d“", connectsForward:false },
+  { id:"dhal", name:"ذَال", isolated:"ذ", initial:"ذ", medial:"ـذ", final:"ـذ", transliteration:"dh", soundDe:"stimmhaftes „th“ wie engl. „this“", connectsForward:false },
+  { id:"ra", name:"رَاء", isolated:"ر", initial:"ر", medial:"ـر", final:"ـر", transliteration:"r", soundDe:"gerolltes „r“", connectsForward:false },
+  { id:"zay", name:"زَاي", isolated:"ز", initial:"ز", medial:"ـز", final:"ـز", transliteration:"z", soundDe:"stimmhaftes „s“ wie in „Sonne“", connectsForward:false },
+  { id:"sin", name:"سِين", isolated:"س", initial:"سـ", medial:"ـسـ", final:"ـس", transliteration:"s", soundDe:"scharfes „s“ wie in „Wasser“", connectsForward:true },
+  { id:"shin", name:"شِين", isolated:"ش", initial:"شـ", medial:"ـشـ", final:"ـش", transliteration:"sh", soundDe:"wie deutsches „sch“", connectsForward:true },
+  { id:"sad", name:"صَاد", isolated:"ص", initial:"صـ", medial:"ـصـ", final:"ـص", transliteration:"ṣ", soundDe:"emphatisches, dumpfes „s“", connectsForward:true },
+  { id:"dad", name:"ضَاد", isolated:"ض", initial:"ضـ", medial:"ـضـ", final:"ـض", transliteration:"ḍ", soundDe:"emphatisches, dumpfes „d“", connectsForward:true },
+  { id:"ta-emphatic", name:"طَاء", isolated:"ط", initial:"طـ", medial:"ـطـ", final:"ـط", transliteration:"ṭ", soundDe:"emphatisches, dumpfes „t“", connectsForward:true },
+  { id:"za-emphatic", name:"ظَاء", isolated:"ظ", initial:"ظـ", medial:"ـظـ", final:"ـظ", transliteration:"ẓ", soundDe:"emphatisches „dh“/„z“", connectsForward:true },
+  { id:"ain", name:"عَيْن", isolated:"ع", initial:"عـ", medial:"ـعـ", final:"ـع", transliteration:"ʿ", soundDe:"enger Rachenlaut ohne deutsches Äquivalent", connectsForward:true },
+  { id:"ghain", name:"غَيْن", isolated:"غ", initial:"غـ", medial:"ـغـ", final:"ـغ", transliteration:"gh", soundDe:"Reibelaut im Rachen, ähnlich franz. „r“", connectsForward:true },
+  { id:"fa", name:"فَاء", isolated:"ف", initial:"فـ", medial:"ـفـ", final:"ـف", transliteration:"f", soundDe:"wie deutsches „f“", connectsForward:true },
+  { id:"qaf", name:"قَاف", isolated:"ق", initial:"قـ", medial:"ـقـ", final:"ـق", transliteration:"q", soundDe:"„k“, aber weit hinten im Rachen gebildet", connectsForward:true },
+  { id:"kaf", name:"كَاف", isolated:"ك", initial:"كـ", medial:"ـكـ", final:"ـك", transliteration:"k", soundDe:"wie deutsches „k“", connectsForward:true },
+  { id:"lam", name:"لَام", isolated:"ل", initial:"لـ", medial:"ـلـ", final:"ـل", transliteration:"l", soundDe:"wie deutsches „l“", connectsForward:true },
+  { id:"mim", name:"مِيم", isolated:"م", initial:"مـ", medial:"ـمـ", final:"ـم", transliteration:"m", soundDe:"wie deutsches „m“", connectsForward:true },
+  { id:"nun", name:"نُون", isolated:"ن", initial:"نـ", medial:"ـنـ", final:"ـن", transliteration:"n", soundDe:"wie deutsches „n“", connectsForward:true },
+  { id:"ha-light", name:"هَاء", isolated:"ه", initial:"هـ", medial:"ـهـ", final:"ـه", transliteration:"h", soundDe:"wie deutsches „h“", connectsForward:true },
+  { id:"waw", name:"وَاو", isolated:"و", initial:"و", medial:"ـو", final:"ـو", transliteration:"w / ū", soundDe:"wie engl. „w“; auch langer Vokal „u“", connectsForward:false },
+  { id:"ya", name:"يَاء", isolated:"ي", initial:"يـ", medial:"ـيـ", final:"ـي", transliteration:"y / ī", soundDe:"wie deutsches „j“; auch langer Vokal „i“", connectsForward:true },
+];
+const ADDITIONAL_SIGNS = [
+  { id:"hamza", symbol:"ء", name:"Hamza", transliteration:"ʾ", soundDe:"kurzer Stimmabsatz (Knacklaut)", example:"قُرْآن" },
+  { id:"alif-hamza-above", symbol:"أ", name:"Alif mit Hamza oben", transliteration:"a/u + ʾ", soundDe:"Alif, das den Hamza-Anlaut trägt", example:"أَحَد" },
+  { id:"alif-hamza-below", symbol:"إ", name:"Alif mit Hamza unten", transliteration:"i + ʾ", soundDe:"Alif mit Hamza, gefolgt von kurzem „i“", example:"إِيَّاكَ" },
+  { id:"alif-madda", symbol:"آ", name:"Alif mit Madda", transliteration:"ā", soundDe:"gedehntes, betontes langes „a“", example:"آدَم" },
+  { id:"ta-marbuta", symbol:"ة", name:"Ta marbuta", transliteration:"a/ah / t", soundDe:"markiert oft weibliche Wortformen", example:"مَدْرَسَة" },
+  { id:"alif-maqsura", symbol:"ى", name:"Alif maqsura", transliteration:"ā", soundDe:"klingt wie Alif, sieht aus wie Ya ohne Punkte", example:"عَلَى" },
+];
+const VOWEL_MARKS = [
+  { id:"fatha", name:"Fatha", transliteration:"a", soundDe:"kurzes „a“", example:"بَ" },
+  { id:"kasra", name:"Kasra", transliteration:"i", soundDe:"kurzes „i“", example:"بِ" },
+  { id:"damma", name:"Damma", transliteration:"u", soundDe:"kurzes „u“", example:"بُ" },
+  { id:"sukun", name:"Sukun", transliteration:"–", soundDe:"kein Vokal danach", example:"بْ" },
+  { id:"shadda", name:"Shadda", transliteration:"Verdopplung", soundDe:"verdoppelt den Konsonanten", example:"بّ" },
+  { id:"tanwin-fath", name:"Tanwin Fath", transliteration:"an", soundDe:"„-an“ am Wortende", example:"بًا" },
+  { id:"tanwin-kasr", name:"Tanwin Kasr", transliteration:"in", soundDe:"„-in“ am Wortende", example:"بٍ" },
+  { id:"tanwin-damm", name:"Tanwin Damm", transliteration:"un", soundDe:"„-un“ am Wortende", example:"بٌ" },
+];
+
+const BADGES = [
+  { id:"first-lesson", name:"Erste Schritte", description:"Erste Lektion abgeschlossen", icon:"🌱" },
+  { id:"streak-7", name:"Eine Woche dran", description:"7 Tage in Folge gelernt", icon:"🔥" },
+  { id:"streak-30", name:"Ein Monat dran", description:"30 Tage in Folge gelernt", icon:"🔥" },
+  { id:"pronunciation-pro", name:"Klare Aussprache", description:"Aussprache-Bewertung von 95+ erreicht", icon:"🎙" },
+  { id:"level-5", name:"Aufsteiger", description:"Level 5 erreicht", icon:"⭐" },
+];
+
+/* ============================== SRS (SM-2), ported from srs.ts ============================== */
+const MIN_EASE = 1.3, DEFAULT_EASE = 2.5;
+function newReviewCard(itemType, itemId, now){
+  now = now || new Date();
+  return { itemType, itemId, easeFactor:DEFAULT_EASE, intervalDays:0, repetitions:0, dueAt:now.toISOString(), lastReviewedAt:null };
+}
+function reviewCard(card, quality, now){
+  now = now || new Date();
+  let { easeFactor, intervalDays, repetitions } = card;
+  if (quality < 3){ repetitions = 0; intervalDays = 1; }
+  else {
+    if (repetitions === 0) intervalDays = 1;
+    else if (repetitions === 1) intervalDays = 6;
+    else intervalDays = Math.round(intervalDays * easeFactor);
+    repetitions += 1;
+  }
+  easeFactor = easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+  easeFactor = Math.max(MIN_EASE, easeFactor);
+  const dueAt = new Date(now.getTime() + intervalDays * 86400000);
+  return { ...card, easeFactor: Math.round(easeFactor*100)/100, intervalDays, repetitions, dueAt: dueAt.toISOString(), lastReviewedAt: now.toISOString() };
+}
+function scoreToQuality(score){
+  if (score >= 95) return 5; if (score >= 85) return 4; if (score >= 70) return 3;
+  if (score >= 50) return 2; if (score >= 25) return 1; return 0;
+}
+
+/* ========================== Gamification, ported from gamification.ts ========================== */
+const XP_LESSON = 20, XP_QUIZ = 5, XP_PRONUNCIATION = 10;
+function xpForLevel(level){ return 50 * level * (level + 1); }
+function levelForXp(xp){ let level = 1; while (xp >= xpForLevel(level)) level += 1; return level; }
+function toDateOnly(iso){ return iso.slice(0,10); }
+function recordActivity(stats, now){
+  now = now || new Date();
+  const today = toDateOnly(now.toISOString());
+  if (stats.lastActivityDate === today) return stats;
+  const yesterday = toDateOnly(new Date(now.getTime() - 86400000).toISOString());
+  const currentStreakDays = stats.lastActivityDate === yesterday ? stats.currentStreakDays + 1 : 1;
+  return { ...stats, lastActivityDate: today, currentStreakDays, longestStreakDays: Math.max(stats.longestStreakDays, currentStreakDays) };
+}
+function addXp(stats, amount){ const xp = stats.xp + amount; return { ...stats, xp, level: levelForXp(xp) }; }
+function evaluateNewBadges(stats, events){
+  const earned = new Set(stats.earnedBadgeIds); const newly = [];
+  const maybe = (id, cond) => { if (cond && !earned.has(id)) newly.push(id); };
+  maybe("first-lesson", (events.lessonsCompletedTotal||0) >= 1);
+  maybe("streak-7", stats.currentStreakDays >= 7);
+  maybe("streak-30", stats.currentStreakDays >= 30);
+  maybe("pronunciation-pro", (events.bestPronunciationScore||0) >= 95);
+  maybe("level-5", stats.level >= 5);
+  return newly;
+}
+
+/* ==================== Pronunciation heuristic scorer, ported from scorer.ts ==================== */
+function scorePronunciation(transliteration, recordingDurationMs){
+  if (recordingDurationMs < 150){
+    return { score:0, feedback:"Keine Aufnahme erkannt. Bitte sprich laut und deutlich nach." };
+  }
+  const letters = transliteration.replace(/[^a-zA-Z']/g, "").length;
+  const expectedMs = Math.max(600, letters * 90);
+  const ratio = Math.min(recordingDurationMs, expectedMs) / Math.max(recordingDurationMs, expectedMs);
+  const score = Math.round(ratio * 100);
+  let feedback;
+  if (score >= 85) feedback = "Timing und Länge passen gut zur Referenz.";
+  else if (score >= 60) feedback = "Solide, aber Tempo und Länge weichen noch spürbar von der Referenz ab.";
+  else if (recordingDurationMs < expectedMs) feedback = "Du sprichst vermutlich zu schnell oder lässt Laute aus.";
+  else feedback = "Du sprichst deutlich länger als die Referenz - achte auf gleichmäßiges Tempo.";
+  return { score, feedback };
+}
+
+/* ============================== Persisted per-viewer state ============================== */
+const STORAGE_KEY = "koran-app-demo-state-v1";
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* private mode / storage unavailable: fall through to defaults */ }
+  return {
+    stats: { xp:0, level:1, currentStreakDays:0, longestStreakDays:0, lastActivityDate:null, earnedBadgeIds:[] },
+    reviewCards: {},
+    completedLessons: {},
+  };
+}
+function saveState(){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+}
+let state = loadState();
+
+function cardKey(itemType, itemId){ return itemType + ":" + itemId; }
+function getOrCreateCard(itemType, itemId){
+  const key = cardKey(itemType, itemId);
+  if (!state.reviewCards[key]) state.reviewCards[key] = newReviewCard(itemType, itemId);
+  return state.reviewCards[key];
+}
+function applyReview(itemType, itemId, score){
+  const card = getOrCreateCard(itemType, itemId);
+  const updated = reviewCard(card, scoreToQuality(score));
+  state.reviewCards[cardKey(itemType, itemId)] = updated;
+  return updated;
+}
+function bestPronunciationScore(){
+  return Object.values(state.pronunciationScores || {}).reduce((m,s)=>Math.max(m,s), 0);
+}
+function applyGamificationEvent(xpDelta){
+  state.stats = recordActivity(state.stats);
+  state.stats = addXp(state.stats, xpDelta);
+  const newlyIds = evaluateNewBadges(state.stats, {
+    lessonsCompletedTotal: Object.keys(state.completedLessons).length,
+    bestPronunciationScore: bestPronunciationScore(),
+  });
+  state.stats.earnedBadgeIds = state.stats.earnedBadgeIds.concat(newlyIds);
+  saveState();
+  return BADGES.filter(b => newlyIds.includes(b.id));
+}
+
+/* ============================== Navigation (mirrors apps/mobile/src/navigation.tsx) ============================== */
+let navStack = [{ screen:"home" }];
+function nav(route){ if (route.screen === "quiz") quizState = null; navStack.push(route); render(); window.scrollTo(0,0); document.getElementById("app").scrollTop = 0; }
+function navBack(){ if (navStack.length > 1) navStack.pop(); render(); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ============================== Screens ============================== */
+function renderStatsHeader(){
+  const s = state.stats;
+  const floor = xpForLevel(s.level-1), ceil = xpForLevel(s.level);
+  const pct = Math.max(0, Math.min(100, ((s.xp-floor)/(ceil-floor))*100));
+  return `<div class="stats-card">
+    <div class="stats-row"><span class="stats-level">Level ${s.level}</span><span class="stats-streak">🔥 ${s.currentStreakDays} Tage</span></div>
+    <div class="xp-track"><div class="xp-fill" style="width:${pct}%"></div></div>
+    <div class="xp-label">${s.xp} / ${ceil} XP</div>
+  </div>`;
+}
+
+function screenHome(){
+  const due = Object.values(state.reviewCards).filter(c => new Date(c.dueAt) <= new Date());
+  const lessons = LESSONS.slice().sort((a,b)=>a.order-b.order);
+  return `
+    ${renderStatsHeader()}
+    <button class="link-row" onclick="nav({screen:'profile'})">Profil &amp; Abzeichen ansehen →</button>
+    <button class="alphabet-card" onclick="nav({screen:'alphabet'})">
+      <div class="alphabet-card-title">📖 Arabisches Alphabet</div>
+      <div class="alphabet-card-sub">Buchstaben, Schreibformen und Vokalzeichen — die Grundlage, um Verse überhaupt lesen zu können.</div>
+    </button>
+    ${due.length ? `<div class="review-banner">${due.length} Wiederholung${due.length===1?"":"en"} heute fällig</div>` : ""}
+    <div class="section-title">Lektionen</div>
+    ${lessons.map(l => `
+      <button class="lesson-card" onclick="nav({screen:'lesson', lessonId:'${l.id}'})">
+        <div class="lesson-title">${esc(l.title)}</div>
+        <div class="lesson-desc">${esc(l.description)}</div>
+        <div class="lesson-meta">Schwierigkeit ${"★".repeat(l.difficulty)}${"☆".repeat(5-l.difficulty)} · ${l.items.length} Inhalte</div>
+      </button>`).join("")}
+  `;
+}
+
+function itemCardHtml(item, showPractice){
+  const arabic = item.type === "verse" ? item.arabicText : item.arabicWord;
+  const ref = item.type === "verse" ? `<div class="item-ref">${item.surahNameLatin} ${item.surahNumber}:${item.ayahNumber}</div>` : "";
+  return `<div class="item-card">
+    ${ref}
+    <div class="item-arabic arabic">${arabic}</div>
+    <div class="item-translit">${esc(item.transliteration)}</div>
+    <div class="item-translation">DE: ${esc(item.translationDe)}</div>
+    <div class="item-translation">EN: ${esc(item.translationEn)}</div>
+    <div class="play-btn">🔇 Audio in dieser Vorschau deaktiviert (siehe Hinweis unten)</div>
+  </div>
+  ${showPractice ? `<button class="practice-btn" onclick="nav({screen:'record', lessonId: currentLessonId, itemType:'${item.type}', itemId:'${item.id}'})">🎙 Aussprache üben</button>` : ""}`;
+}
+
+let currentLessonId = null;
+function screenLesson(lessonId){
+  currentLessonId = lessonId;
+  const lesson = LESSONS.find(l => l.id === lessonId);
+  const items = resolvedLessonItems(lessonId);
+  return `
+    <button class="back-link" onclick="navBack()">← Zurück</button>
+    <h2>${esc(lesson.title)}</h2>
+    <p class="lesson-desc" style="margin-bottom:14px;">${esc(lesson.description)}</p>
+    ${items.map(i => itemCardHtml(i, true)).join("")}
+    <button class="accent-btn" onclick="nav({screen:'quiz', lessonId:'${lessonId}'})">📝 Quiz starten</button>
+    <button class="primary-btn" onclick="completeLesson('${lessonId}')">✓ Lektion abschließen</button>
+    <div class="notice">Audio-Wiedergabe und Mikrofon-Aufnahme sind in dieser Claude-Artifact-Vorschau sandboxed und daher deaktiviert bzw. eingeschränkt (externe Audiodateien werden vom Vorschau-Frame blockiert). In der lokal gehosteten App (siehe README) funktionieren beide vollständig.</div>
+  `;
+}
+
+function completeLesson(lessonId){
+  const wasNew = !state.completedLessons[lessonId];
+  state.completedLessons[lessonId] = true;
+  for (const ref of LESSONS.find(l=>l.id===lessonId).items) getOrCreateCard(ref.type, ref.id);
+  if (wasNew) applyGamificationEvent(XP_LESSON);
+  saveState();
+  navBack();
+}
+
+let recorder = null, recordedChunks = [], recordStartTime = 0, recordTimerHandle = null;
+function screenRecord(lessonId, itemType, itemId){
+  const item = findItem(itemType, itemId);
+  return `
+    <button class="back-link" onclick="navBack()">← Zurück</button>
+    ${itemCardHtml(item, false)}
+    <div class="record-box" id="record-box">
+      <button class="record-btn" onclick="startRecording('${lessonId}','${itemType}','${itemId}')">🎙 Aufnahme starten</button>
+    </div>
+    <p class="hint">Sprich ${itemType === "verse" ? "den Vers" : "das Wort"} laut nach der Referenz-Aussprache nach.</p>
+  `;
+}
+
+async function startRecording(lessonId, itemType, itemId){
+  const box = document.getElementById("record-box");
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    recordedChunks = [];
+    recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = e => recordedChunks.push(e.data);
+    recordStartTime = Date.now();
+    recorder.start();
+    box.innerHTML = `<div class="timer" id="record-timer">0.0 s</div><button class="stop-btn" onclick="stopRecording('${lessonId}','${itemType}','${itemId}')">⏹ Aufnahme beenden &amp; bewerten</button>`;
+    recordTimerHandle = setInterval(() => {
+      const el = document.getElementById("record-timer");
+      if (el) el.textContent = ((Date.now()-recordStartTime)/1000).toFixed(1) + " s";
+    }, 100);
+  } catch (err) {
+    box.innerHTML = `<button class="record-btn" onclick="startRecording('${lessonId}','${itemType}','${itemId}')">🎙 Aufnahme starten</button>
+      <p class="err-text">Mikrofonzugriff nicht verfügbar (${esc(err && err.message ? err.message : String(err))}). In dieser Artifact-Vorschau ist das Mikrofon oft sandboxed blockiert — in der lokal gehosteten App funktioniert das mit echtem Mikrofonzugriff.</p>`;
+  }
+}
+
+function stopRecording(lessonId, itemType, itemId){
+  clearInterval(recordTimerHandle);
+  const durationMs = Date.now() - recordStartTime;
+  if (recorder && recorder.state !== "inactive") recorder.stop();
+  if (recorder && recorder.stream) recorder.stream.getTracks().forEach(t => t.stop());
+  const item = findItem(itemType, itemId);
+  const result = scorePronunciation(item.transliteration, durationMs);
+  applyReview(itemType, itemId, result.score);
+  state.pronunciationScores = state.pronunciationScores || {};
+  state.pronunciationScores[cardKey(itemType,itemId)] = Math.max(state.pronunciationScores[cardKey(itemType,itemId)] || 0, result.score);
+  const newBadges = applyGamificationEvent(result.score >= 85 ? XP_PRONUNCIATION : 0);
+  nav({ screen:"feedback", lessonId, itemType, itemId, result, newBadges });
+}
+
+function screenFeedback(lessonId, itemType, itemId, result, newBadges){
+  const color = result.score >= 85 ? "var(--primary)" : result.score >= 60 ? "var(--accent)" : "var(--danger)";
+  return `
+    <div class="score-wrap">
+      <span class="score-value" style="color:${color}">${result.score}</span><span class="score-max">/100</span>
+      <p class="feedback-text">${esc(result.feedback)}</p>
+      <p class="disclaimer">Hinweis: einfache Platzhalter-Bewertung auf Basis der Aufnahmedauer, keine echte Phonem-Analyse (siehe README zu Azure Pronunciation Assessment).</p>
+      ${newBadges && newBadges.length ? `<div class="badge-box"><div class="badge-box-title">Neues Abzeichen freigeschaltet!</div>${newBadges.map(b=>`<div>${b.icon} ${esc(b.name)} — ${esc(b.description)}</div>`).join("")}</div>` : ""}
+      <button class="ghost-btn" onclick="navStack.pop(); nav({screen:'record', lessonId:'${lessonId}', itemType:'${itemType}', itemId:'${itemId}'})">🔁 Nochmal versuchen</button>
+      <button class="primary-btn" onclick="navBack(); navBack();">Weiter zur Lektion</button>
+    </div>
+  `;
+}
+
+let quizState = null;
+function screenQuiz(lessonId){
+  if (!quizState || quizState.lessonId !== lessonId){
+    quizState = { lessonId, questions: QUIZ_QUESTIONS.filter(q=>q.lessonId===lessonId), index:0, correctCount:0, selected:null, feedback:null };
+  }
+  const qs = quizState.questions;
+  if (qs.length === 0){
+    return `<div class="quiz-summary"><p>Für diese Lektion gibt es noch keine Quizfragen.</p><button class="primary-btn" onclick="quizState=null; navBack();">Zurück</button></div>`;
+  }
+  if (quizState.index >= qs.length){
+    const summary = `<div class="quiz-summary"><h2>Quiz beendet!</h2><p style="margin-top:10px;color:var(--text-muted)">${quizState.correctCount} von ${qs.length} richtig</p><button class="primary-btn" onclick="quizState=null; navBack();">Zurück zur Lektion</button></div>`;
+    return summary;
+  }
+  const q = qs[quizState.index];
+  const isArabicOptions = q.type === "fill_blank";
+  return `
+    <p class="quiz-progress">Frage ${quizState.index+1} / ${qs.length}</p>
+    <p class="quiz-prompt ${isArabicOptions ? 'arabic' : ''}" style="direction:${isArabicOptions?'rtl':'ltr'}; text-align:${isArabicOptions?'right':'left'}">${esc(q.prompt).replace(/\n/g,'<br>')}</p>
+    ${q.options.map(opt => {
+      let cls = "quiz-option" + (isArabicOptions ? " arabic" : " lat");
+      if (quizState.feedback){
+        if (opt === quizState.feedback.correctAnswer) cls += " correct";
+        else if (opt === quizState.selected) cls += " wrong";
+      }
+      return `<button class="${cls}" ${quizState.feedback?"disabled":""} onclick="answerQuiz(${JSON.stringify(opt).replace(/"/g,'&quot;')})">${esc(opt)}</button>`;
+    }).join("")}
+    ${quizState.feedback ? `<button class="accent-btn" onclick="nextQuizQuestion()">Weiter →</button>` : ""}
+  `;
+}
+function answerQuiz(answer){
+  const q = quizState.questions[quizState.index];
+  const correct = answer === q.correctAnswer;
+  if (correct) quizState.correctCount++;
+  quizState.selected = answer;
+  quizState.feedback = { correct, correctAnswer: q.correctAnswer };
+  applyReview("verse", q.verseId, correct ? 100 : 0);
+  applyGamificationEvent(correct ? XP_QUIZ : 0);
+  render();
+}
+function nextQuizQuestion(){
+  quizState.index++; quizState.selected = null; quizState.feedback = null;
+  render();
+}
+
+function screenProfile(){
+  const s = state.stats;
+  return `
+    <button class="back-link" onclick="navBack()">← Zurück</button>
+    ${renderStatsHeader()}
+    <div class="streak-row">
+      <div class="streak-box"><div class="streak-value">${s.currentStreakDays}</div><div class="streak-label">Aktuelle Streak</div></div>
+      <div class="streak-box"><div class="streak-value">${s.longestStreakDays}</div><div class="streak-label">Beste Streak</div></div>
+    </div>
+    <div class="section-title">Abzeichen</div>
+    <div class="badge-grid">
+      ${BADGES.map(b => {
+        const earned = s.earnedBadgeIds.includes(b.id);
+        return `<div class="badge-row ${earned?"":"locked"}"><span class="badge-icon">${earned?b.icon:"🔒"}</span><div><div class="badge-name">${esc(b.name)}</div><div class="badge-desc">${esc(b.description)}</div></div></div>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+function letterCardHtml(l){
+  return `<div class="letter-card">
+    <div class="letter-head"><span class="letter-name">${l.name}</span><span class="letter-lit">${esc(l.transliteration)}</span></div>
+    <div class="letter-sound">${esc(l.soundDe)}</div>
+    <div class="forms-row">
+      <div class="form-cell"><div class="form-glyph">${l.isolated}</div><div class="form-label">Isoliert</div></div>
+      <div class="form-cell"><div class="form-glyph">${l.initial}</div><div class="form-label">Anfang</div></div>
+      <div class="form-cell"><div class="form-glyph">${l.medial}</div><div class="form-label">Mitte</div></div>
+      <div class="form-cell"><div class="form-glyph">${l.final}</div><div class="form-label">Ende</div></div>
+    </div>
+    ${!l.connectsForward ? `<div class="no-connect">verbindet sich nicht mit dem nächsten Buchstaben</div>` : ""}
+  </div>`;
+}
+function signRowHtml(s){
+  return `<div class="sign-row">
+    <span class="sign-symbol">${s.example || s.symbol}</span>
+    <div><div class="sign-name">${esc(s.name)} <span class="sign-lit">(${esc(s.transliteration)})</span></div><div class="sign-sound">${esc(s.soundDe)}</div></div>
+  </div>`;
+}
+function screenAlphabet(){
+  return `
+    <button class="back-link" onclick="navBack()">← Zurück</button>
+    <h2>Arabisches Alphabet</h2>
+    <p class="section-sub" style="margin-top:8px;">Die 28 Buchstaben mit ihren vier Formen. Quran-Texte sind vollständig vokalisiert — die Vokalzeichen weiter unten brauchst du, um Verse wie „مِنْ“ oder „قُلْ“ zu lesen.</p>
+    <div class="section-title">Die 28 Buchstaben</div>
+    ${ARABIC_ALPHABET.map(letterCardHtml).join("")}
+    <div class="section-title">Zusatzzeichen</div>
+    <p class="section-sub">Hamza-Formen und Sonderbuchstaben, die in Quran-Texten ständig vorkommen.</p>
+    <div class="sign-list">${ADDITIONAL_SIGNS.map(signRowHtml).join("")}</div>
+    <div class="section-title">Vokalzeichen (Harakat)</div>
+    <p class="section-sub">Am Beispiel des Buchstabens ب (ba) gezeigt.</p>
+    <div class="sign-list">${VOWEL_MARKS.map(signRowHtml).join("")}</div>
+  `;
+}
+
+function render(){
+  const route = navStack[navStack.length-1];
+  const app = document.getElementById("app");
+  let html = "";
+  switch(route.screen){
+    case "home": html = screenHome(); break;
+    case "lesson": html = screenLesson(route.lessonId); break;
+    case "record": html = screenRecord(route.lessonId, route.itemType, route.itemId); break;
+    case "feedback": html = screenFeedback(route.lessonId, route.itemType, route.itemId, route.result, route.newBadges); break;
+    case "quiz": html = screenQuiz(route.lessonId); break;
+    case "profile": html = screenProfile(); break;
+    case "alphabet": html = screenAlphabet(); break;
+  }
+  app.innerHTML = html;
+}
+
+render();
+</script>
