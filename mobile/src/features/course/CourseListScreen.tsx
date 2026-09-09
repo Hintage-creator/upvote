@@ -1,13 +1,16 @@
 import React, { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { getLanguagePack } from '../../data/languages';
 import { lessonsForUnit, unitsSorted } from '../../data/contentLookup';
 import { CourseStackParamList } from '../../navigation/types';
 import { isLessonUnlocked } from '../dungeon/dungeon';
 import { progressRepository } from '../progress';
+import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
+import { useShake } from '../../components/animations/useShake';
+import { Lesson } from '../../types/content';
 
 type Props = NativeStackScreenProps<CourseStackParamList, 'CourseList'>;
 
@@ -30,14 +33,17 @@ export function CourseListScreen({ navigation }: Props) {
   );
 
   const completed = completedLessonIds ?? [];
+  let globalIndex = 0;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.header}>Die Pyramide</Text>
-      <Text style={styles.subheader}>
-        Kungbäkola sitzt fest. Löse die Rätsel Kammer für Kammer, um tiefer vorzudringen — und
-        irgendwann wieder hinauszufinden.
-      </Text>
+      <FadeSlideIn>
+        <Text style={styles.header}>Die Pyramide</Text>
+        <Text style={styles.subheader}>
+          Kungbäkola sitzt fest. Löse die Rätsel Kammer für Kammer, um tiefer vorzudringen — und
+          irgendwann wieder hinauszufinden.
+        </Text>
+      </FadeSlideIn>
 
       {units.map((unit) => (
         <View key={unit.id} style={styles.unitBlock}>
@@ -47,34 +53,66 @@ export function CourseListScreen({ navigation }: Props) {
           {lessonsForUnit(pack, unit.id).map((lesson) => {
             const unlocked = completedLessonIds === null || isLessonUnlocked(pack, lesson.id, completed);
             const isCompleted = completed.includes(lesson.id);
+            const index = globalIndex++;
             return (
-              <Pressable
+              <LessonCard
                 key={lesson.id}
-                style={[styles.lessonCard, !unlocked && styles.lessonCardLocked]}
-                onPress={() => {
-                  if (!unlocked) {
-                    Alert.alert('Kammer verriegelt', 'Löse zuerst die vorherige Kammer, um hier weiterzukommen.');
-                    return;
-                  }
-                  navigation.navigate('Lesson', { lessonId: lesson.id });
-                }}
-                accessibilityRole="button"
-              >
-                <View style={[styles.lessonLevelBadge, !unlocked && styles.lessonLevelBadgeLocked]}>
-                  <Text style={styles.lessonLevelText}>{unlocked ? (isCompleted ? '✓' : lesson.level) : '🔒'}</Text>
-                </View>
-                <View style={styles.lessonTextBlock}>
-                  <Text style={[styles.lessonTitle, !unlocked && styles.textLocked]}>{lesson.titleDe}</Text>
-                  {lesson.descriptionDe ? (
-                    <Text style={[styles.lessonDescription, !unlocked && styles.textLocked]}>{lesson.descriptionDe}</Text>
-                  ) : null}
-                </View>
-              </Pressable>
+                lesson={lesson}
+                unlocked={unlocked}
+                isCompleted={isCompleted}
+                index={index}
+                onPress={() => navigation.navigate('Lesson', { lessonId: lesson.id })}
+              />
             );
           })}
         </View>
       ))}
     </ScrollView>
+  );
+}
+
+function LessonCard({
+  lesson,
+  unlocked,
+  isCompleted,
+  index,
+  onPress,
+}: {
+  lesson: Lesson;
+  unlocked: boolean;
+  isCompleted: boolean;
+  index: number;
+  onPress: () => void;
+}) {
+  const { style: shakeStyle, shake } = useShake();
+
+  return (
+    <FadeSlideIn delay={Math.min(index, 8) * 50}>
+      <Animated.View style={shakeStyle}>
+        <Pressable
+          style={[styles.lessonCard, !unlocked && styles.lessonCardLocked]}
+          onPress={() => {
+            if (!unlocked) {
+              shake();
+              Alert.alert('Kammer verriegelt', 'Löse zuerst die vorherige Kammer, um hier weiterzukommen.');
+              return;
+            }
+            onPress();
+          }}
+          accessibilityRole="button"
+        >
+          <View style={[styles.lessonLevelBadge, !unlocked && styles.lessonLevelBadgeLocked]}>
+            <Text style={styles.lessonLevelText}>{unlocked ? (isCompleted ? '✓' : lesson.level) : '🔒'}</Text>
+          </View>
+          <View style={styles.lessonTextBlock}>
+            <Text style={[styles.lessonTitle, !unlocked && styles.textLocked]}>{lesson.titleDe}</Text>
+            {lesson.descriptionDe ? (
+              <Text style={[styles.lessonDescription, !unlocked && styles.textLocked]}>{lesson.descriptionDe}</Text>
+            ) : null}
+          </View>
+        </Pressable>
+      </Animated.View>
+    </FadeSlideIn>
   );
 }
 

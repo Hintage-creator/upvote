@@ -1,7 +1,8 @@
-import React from 'react';
-import { Image, ImageStyle, StyleProp, StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, ImageStyle, StyleProp, StyleSheet, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { SOOT_STAGE_COUNT } from './dungeon';
+import { usePulse } from '../../components/animations/usePulse';
 
 /**
  * Metro requires static string literals, so the soot-stage artwork (derived
@@ -21,19 +22,44 @@ interface Props {
   sootStage: number;
   size?: number;
   style?: StyleProp<ImageStyle>;
+  /** Idle breathing animation — on by default, off for e.g. tiny list thumbnails. */
+  animated?: boolean;
 }
 
-/** Kungbäkola's portrait at a given soot stage (0 = clean, 4 = pitch black). */
-export function CatAvatar({ sootStage, size = 96, style }: Props) {
+/** Kungbäkola's portrait at a given soot stage (0 = clean, 4 = pitch black). Crossfades between stages and gently "breathes" when idle. */
+export function CatAvatar({ sootStage, size = 96, style, animated = true }: Props) {
   const clamped = Math.max(0, Math.min(SOOT_STAGE_COUNT - 1, Math.round(sootStage)));
+  const [displayedStage, setDisplayedStage] = useState(clamped);
+  const [previousStage, setPreviousStage] = useState<number | null>(null);
+  const crossfade = useRef(new Animated.Value(1)).current;
+  const pulseStyle = usePulse(1.04, 1600);
+
+  useEffect(() => {
+    if (clamped === displayedStage) return;
+    setPreviousStage(displayedStage);
+    setDisplayedStage(clamped);
+    crossfade.setValue(0);
+    Animated.timing(crossfade, { toValue: 1, duration: 650, useNativeDriver: true }).start(() => {
+      setPreviousStage(null);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clamped]);
+
+  const imageStyle = { width: size, height: size, borderRadius: size * 0.22 };
+
   return (
-    <View style={[styles.frame, { width: size, height: size, borderRadius: size * 0.22 }]}>
-      <Image
-        source={SOOT_STAGE_IMAGES[clamped]}
-        style={[{ width: size, height: size, borderRadius: size * 0.22 }, style]}
-        resizeMode="cover"
-      />
-    </View>
+    <Animated.View style={animated ? pulseStyle : undefined}>
+      <View style={[styles.frame, { width: size, height: size, borderRadius: size * 0.22 }]}>
+        {previousStage !== null ? (
+          <Animated.Image source={SOOT_STAGE_IMAGES[previousStage]} style={[imageStyle, style, styles.layer]} resizeMode="cover" />
+        ) : null}
+        <Animated.Image
+          source={SOOT_STAGE_IMAGES[displayedStage]}
+          style={[imageStyle, style, styles.layer, { opacity: previousStage !== null ? crossfade : 1 }]}
+          resizeMode="cover"
+        />
+      </View>
+    </Animated.View>
   );
 }
 
@@ -43,4 +69,5 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.border,
   },
+  layer: { position: 'absolute', top: 0, left: 0 },
 });

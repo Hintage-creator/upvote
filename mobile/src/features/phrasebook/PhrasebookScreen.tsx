@@ -6,8 +6,10 @@ import { phrasesByCategory } from '../../data/contentLookup';
 import { ScriptText } from '../script/ScriptText';
 import { ScriptModeToggle } from '../script/ScriptModeToggle';
 import { ReviewBadge } from '../script/ReviewBadge';
+import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
 
 const pack = getLanguagePack('mnk');
+const MAX_STAGGER = 8;
 
 const CATEGORY_LABELS_DE: Record<string, string> = {
   greetings: 'Begrüßungen',
@@ -16,14 +18,17 @@ const CATEGORY_LABELS_DE: Record<string, string> = {
 
 export function PhrasebookScreen() {
   const categories = phrasesByCategory(pack);
+  let itemIndex = 0;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.header}>Phrasenbuch</Text>
-      <Text style={styles.subheader}>
-        Alltagssätze zum Nachschlagen — Bedeutung auf Deutsch und Englisch. Audio folgt, sobald
-        Muttersprachler-Aufnahmen vorliegen.
-      </Text>
+      <FadeSlideIn>
+        <Text style={styles.header}>Phrasenbuch</Text>
+        <Text style={styles.subheader}>
+          Alltagssätze zum Nachschlagen — Bedeutung auf Deutsch und Englisch. Audio folgt, sobald
+          Muttersprachler-Aufnahmen vorliegen.
+        </Text>
+      </FadeSlideIn>
       <View style={styles.toggleRow}>
         <ScriptModeToggle />
       </View>
@@ -31,17 +36,22 @@ export function PhrasebookScreen() {
       {Array.from(categories.entries()).map(([category, phrases]) => (
         <View key={category} style={styles.categoryBlock}>
           <Text style={styles.categoryTitle}>{CATEGORY_LABELS_DE[category] ?? category}</Text>
-          {phrases.map((phrase) => (
-            <View key={phrase.id} style={styles.phraseCard}>
-              <View style={styles.headerRow}>
-                <ScriptText script={phrase.script} size="medium" />
-                <ReviewBadge status={phrase.status} />
-              </View>
-              <Text style={styles.de}>{phrase.translations.de}</Text>
-              <Text style={styles.en}>{phrase.translations.en}</Text>
-              {phrase.literalTranslation ? <Text style={styles.literal}>{phrase.literalTranslation.de}</Text> : null}
-            </View>
-          ))}
+          {phrases.map((phrase) => {
+            const delay = Math.min(itemIndex++, MAX_STAGGER) * 45;
+            return (
+              <FadeSlideIn key={phrase.id} delay={delay}>
+                <View style={styles.phraseCard}>
+                  <View style={styles.headerRow}>
+                    <ScriptText script={phrase.script} size="medium" />
+                    <ReviewBadge status={phrase.status} />
+                  </View>
+                  <Text style={styles.de}>{phrase.translations.de}</Text>
+                  <Text style={styles.en}>{phrase.translations.en}</Text>
+                  {phrase.literalTranslation ? <Text style={styles.literal}>{phrase.literalTranslation.de}</Text> : null}
+                </View>
+              </FadeSlideIn>
+            );
+          })}
         </View>
       ))}
     </ScrollView>

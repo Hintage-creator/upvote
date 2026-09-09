@@ -1,11 +1,19 @@
 import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
+import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
 
 interface Props {
   onDone: () => void;
   buttonLabel?: string;
 }
+
+const PARAGRAPHS = [
+  'Irgendwo am Rand der Sahara streunt eine kleine getigerte Katze durch den Sand — auf der Suche nach Schatten, nach Wasser, nach irgendetwas Vertrautem.',
+  'Zwischen den Dünen taucht plötzlich etwas Riesiges auf: eine uralte Pyramide, halb vom Sand verschluckt. Neugierig schlüpft die Katze durch einen schmalen Spalt hinein.',
+  'Kaum ist sie drinnen, schiebt sich mit einem dumpfen Grollen ein Steinblock vor den Eingang. Die Tür ist zu. Der einzige Weg zurück ans Licht führt durch die Kammern der Pyramide — und jede Kammer ist mit einem Rätsel in der Sprache der Wände verriegelt.',
+  'Je tiefer Kungbäkola vordringt, desto mehr uralter Staub und Ruß legt sich auf ihr Fell. Nur wer die Rätsel löst, kommt weiter — und irgendwann wieder heraus.',
+];
 
 /**
  * The framing story, shown once before the pyramid opens (and replayable
@@ -16,33 +24,27 @@ export function StoryScreen({ onDone, buttonLabel = 'Die Pyramide betreten' }: P
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Image
-          source={require('../../../assets/mascot/story-standing.png')}
-          style={styles.illustration}
-          resizeMode="cover"
-        />
-        <Text style={styles.title}>Kungbäkola</Text>
-        <Text style={styles.paragraph}>
-          Irgendwo am Rand der Sahara streunt eine kleine getigerte Katze durch den Sand — auf der
-          Suche nach Schatten, nach Wasser, nach irgendetwas Vertrautem.
-        </Text>
-        <Text style={styles.paragraph}>
-          Zwischen den Dünen taucht plötzlich etwas Riesiges auf: eine uralte Pyramide, halb vom
-          Sand verschluckt. Neugierig schlüpft die Katze durch einen schmalen Spalt hinein.
-        </Text>
-        <Text style={styles.paragraph}>
-          Kaum ist sie drinnen, schiebt sich mit einem dumpfen Grollen ein Steinblock vor den
-          Eingang. Die Tür ist zu. Der einzige Weg zurück ans Licht führt durch die Kammern der
-          Pyramide — und jede Kammer ist mit einem Rätsel in der Sprache der Wände verriegelt.
-        </Text>
-        <Text style={styles.paragraph}>
-          Je tiefer Kungbäkola vordringt, desto mehr uralter Staub und Ruß legt sich auf ihr Fell.
-          Nur wer die Rätsel löst, kommt weiter — und irgendwann wieder heraus.
-        </Text>
+        <FadeSlideIn distance={20}>
+          <Image
+            source={require('../../../assets/mascot/story-standing.png')}
+            style={styles.illustration}
+            resizeMode="cover"
+          />
+        </FadeSlideIn>
+        <FadeSlideIn delay={150}>
+          <Text style={styles.title}>Kungbäkola</Text>
+        </FadeSlideIn>
+        {PARAGRAPHS.map((text, i) => (
+          <FadeSlideIn key={i} delay={250 + i * 220}>
+            <Text style={styles.paragraph}>{text}</Text>
+          </FadeSlideIn>
+        ))}
       </ScrollView>
-      <Pressable style={styles.button} onPress={onDone} accessibilityRole="button">
-        <Text style={styles.buttonText}>{buttonLabel}</Text>
-      </Pressable>
+      <FadeSlideIn delay={250 + PARAGRAPHS.length * 220}>
+        <Pressable style={styles.button} onPress={onDone} accessibilityRole="button">
+          <Text style={styles.buttonText}>{buttonLabel}</Text>
+        </Pressable>
+      </FadeSlideIn>
     </View>
   );
 }

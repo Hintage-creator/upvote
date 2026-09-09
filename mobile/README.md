@@ -14,6 +14,11 @@ ist eine reine UI-Schicht darüber, kein Teil des Sprachinhalt-Datenmodells.
 Siehe „Was noch fehlt“ unten — insbesondere: **alle Sprachinhalte sind
 ungeprüfte Platzhalter**, siehe `src/data/languages/mnk/README.md`.
 
+**Zielplattform aktuell: Web.** Expo baut dieselbe Codebasis für iOS/Android/
+Web (react-native-web); für den ersten Test läuft die App als Web-App
+(`npm run web`). Mobile Builds bleiben ohne Codeänderung möglich, sobald das
+gebraucht wird.
+
 ## Architektur-Überblick
 
 ```
@@ -92,6 +97,17 @@ mobile/
   (`QuizScreen.PASS_RATIO`) — erst dann wird die nächste Kammer freigeschaltet.
   Weil das komplett unabhängig vom Sprachinhalt ist, funktioniert es später
   auch für Bambara/Dyula-Kurse ohne Änderung.
+- **Animationen nutzen ausschließlich Reacts/React Natives eingebaute
+  `Animated`-API** (`src/components/animations/`), bewusst statt
+  `react-native-reanimated`: keine zusätzliche native Abhängigkeit, kein
+  Babel-Plugin, funktioniert identisch auf Web/iOS/Android. Bausteine:
+  `FadeSlideIn` (Eintritts-Animation, mit `delay` für gestaffelte Listen),
+  `useShake`/`usePulse` (Hooks, die einen Animated-Style + Trigger liefern),
+  `AnimatedBar` (weiche Balken-Füllung für Quiz-Fortschritt/XP-Level),
+  `Celebration` (Partikel-Burst beim gelösten Rätsel). Eingesetzt u. a. für
+  den Ruß-Avatar-Crossfade in `CatAvatar`, den gleitenden Indikator in
+  `ScriptModeToggle`, gestaffelte Karten-Listen in Kurs/Lektion/Phrasenbuch
+  und Quiz-Feedback (Wackeln bei falscher Antwort, Bounce bei richtiger).
 
 ## Setup & Ausführen
 
@@ -141,22 +157,36 @@ verarbeitet mit Pillow (Python), Skript nicht Teil des Repos:
 - `npm run typecheck` läuft ohne Fehler über den gesamten `src/`-Code.
 - `npm test`: 31 Jest-Tests (SM-2-Terminplanung, Streaks/XP/Level,
   Storage-Repository, Quiz-Generierung, Dungeon-Logik) — alle grün.
-- Grundkurs-Struktur mit aufsteigendem Schwierigkeitsgrad (Alphabet → Zahlen
-  → Pronomen/Grammatik → Begrüßungen), zweisprachige Latein/N'Ko-Darstellung
-  mit Umschalter, Phrasenbuch, Multiple-Choice- und Übersetzungs-Quiz,
-  Fortschritts-Screen mit Streak/Level/fälligen Wiederholungen, Story-Intro
-  und Ruß-Avatar/Raum-Sperre als Dungeon-Rahmen.
+- **Tatsächlich im Browser durchgeklickt** (Expo-Web-Dev-Server + headless
+  Chromium, Playwright-Skript, nicht Teil des Repos): Story-Intro, Kurs-Tab
+  mit Kammer-Sperren/Freischaltung über mehrere Lektionen hinweg, Lektion mit
+  Latein/N'Ko/Beide-Umschalter, kompletter Quiz-Durchlauf inkl. Ergebnis-Screen
+  (Erfolg und Misserfolg), Phrasenbuch, Fortschritts-Tab mit Ruß-Avatar. Keine
+  Konsolenfehler in diesem Durchlauf. Dabei ist ein echter Bug aufgefallen und
+  behoben worden: In `mnk/lessons.ts` steckte ein rohes N'Ko-Zeichen direkt in
+  einem deutschen Beschreibungstext (außerhalb von `ScriptText`/ohne die
+  N'Ko-Schriftart) und wurde als kaputtes Glyph gerendert.
+- N'Ko-Mehrbuchstaben-Rendering (Wörter/Phrasen, nicht nur einzelne Buchstaben)
+  wurde geprüft: Der Browser verbindet die Zeichen sichtbar zu zusammenhängenden
+  Formen (korrektes komplexes Text-Shaping über die eingebettete Schriftart),
+  Wortgrenzen bei mehrwortigen Phrasen stimmen mit der lateinischen Vorlage
+  überein.
 
 ## Was nicht verifiziert wurde
 
-Diese Sandbox-Umgebung hat **kein Gerät und keinen Simulator/Emulator**. Der
-UI-Code wurde nicht visuell in Expo Go / einem Simulator getestet — nur
-Typecheck und Logik-Tests. Vor dem ersten echten Einsatz bitte:
+Verifiziert wurde bisher nur die **Web-Variante** (react-native-web) in einem
+Playwright-gesteuerten Headless-Chromium. **Nicht** getestet:
 
-1. `npm start` lokal ausführen und mit Expo Go (iOS/Android) oder einem
-   Simulator durchklicken.
-2. Insbesondere prüfen: N'Ko-Schriftdarstellung (Font-Ladezeit, RTL-Layout),
-   Navigation zwischen den drei Tabs, Quiz-Flow Anfang bis Ende.
+1. Echte native Mobile-Builds (iOS/Android, Expo Go oder Simulator) — diese
+   Sandbox hat kein Gerät/keinen Simulator. Da die App dieselbe Codebasis über
+   react-native-web nutzt, ist ein Großteil der Logik bereits laufend
+   bestätigt, aber native-spezifisches Verhalten (z. B. Schrift-Rendering,
+   Safe-Area, Gesten) ist offen.
+2. Der "Rätsel gelöst"-Erfolgspfad mit Konfetti-Animation (`Celebration`)
+   wurde im automatisierten Durchlauf nicht erzwungen (die Testantworten waren
+   nicht gezielt korrekt) — der Code-Pfad ist einfach genug, um ihn auf
+   dieselbe, bereits geprüfte Animations-Grundlage (Opacity/Scale via
+   `Animated`) zu stützen, aber visuell nicht extra bestätigt.
 
 ## Was inhaltlich vor Produktivbetrieb fehlt
 

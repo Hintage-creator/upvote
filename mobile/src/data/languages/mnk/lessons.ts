@@ -22,8 +22,8 @@ export const lessons: Lesson[] = [
     level: 1,
     titleDe: 'Konsonanten & Nasal',
     titleEn: 'Consonants & the nasal',
-    descriptionDe: 'Die wichtigsten Konsonanten sowie der silbische Nasal ߒ.',
-    descriptionEn: 'The core consonants plus the syllabic nasal ߒ.',
+    descriptionDe: 'Die wichtigsten Konsonanten sowie der silbische Nasal „n“.',
+    descriptionEn: 'The core consonants plus the syllabic nasal "n".',
     sections: [{ type: 'alphabet', itemIds: [...nasal.map((n) => n.id), ...consonants.map((c) => c.id)] }],
   },
   {

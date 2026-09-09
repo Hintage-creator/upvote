@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { getLanguagePack } from '../../data/languages';
 import { grammarByIds, lessonById, phrasesByIds, vocabByIds } from '../../data/contentLookup';
@@ -10,16 +10,20 @@ import { ScriptModeToggle } from '../script/ScriptModeToggle';
 import { ReviewBadge } from '../script/ReviewBadge';
 import { progressRepository } from '../progress';
 import { addXp, recordActivity } from '../progress/srs';
+import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
 
 type Props = NativeStackScreenProps<CourseStackParamList, 'Lesson'>;
 
 const pack = getLanguagePack('mnk');
 const XP_PER_LESSON = 20;
+const MAX_STAGGER = 8;
 
 export function LessonScreen({ route, navigation }: Props) {
   const { lessonId } = route.params;
   const lesson = lessonById(pack, lessonId);
   const [completed, setCompleted] = useState(false);
+  const [justCompleted, setJustCompleted] = useState(false);
+  const bounce = React.useRef(new Animated.Value(1)).current;
 
   const hasQuizzableContent = useMemo(
     () => lesson?.sections.some((s) => s.type === 'vocab' || s.type === 'alphabet' || s.type === 'phrases') ?? false,
@@ -41,12 +45,19 @@ export function LessonScreen({ route, navigation }: Props) {
     const withXp = addXp(withActivity, XP_PER_LESSON);
     await progressRepository.saveUserProgress(withXp);
     setCompleted(true);
+    setJustCompleted(true);
+    bounce.setValue(0.85);
+    Animated.spring(bounce, { toValue: 1, useNativeDriver: true, speed: 14, bounciness: 12 }).start();
   }
+
+  let itemIndex = 0;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{lesson.titleDe}</Text>
-      {lesson.descriptionDe ? <Text style={styles.description}>{lesson.descriptionDe}</Text> : null}
+      <FadeSlideIn>
+        <Text style={styles.title}>{lesson.titleDe}</Text>
+        {lesson.descriptionDe ? <Text style={styles.description}>{lesson.descriptionDe}</Text> : null}
+      </FadeSlideIn>
 
       <View style={styles.toggleRow}>
         <ScriptModeToggle />
@@ -57,16 +68,21 @@ export function LessonScreen({ route, navigation }: Props) {
           const items = vocabByIds(pack, section.itemIds);
           return (
             <View key={idx} style={styles.sectionBlock}>
-              {items.map((item) => (
-                <View key={item.id} style={styles.itemCard}>
-                  <View style={styles.itemHeaderRow}>
-                    <ScriptText script={item.script} size="medium" />
-                    <ReviewBadge status={item.status} />
-                  </View>
-                  <Text style={styles.translation}>{item.translations.de}</Text>
-                  {item.pronunciationHint ? <Text style={styles.hint}>{item.pronunciationHint}</Text> : null}
-                </View>
-              ))}
+              {items.map((item) => {
+                const delay = Math.min(itemIndex++, MAX_STAGGER) * 45;
+                return (
+                  <FadeSlideIn key={item.id} delay={delay}>
+                    <View style={styles.itemCard}>
+                      <View style={styles.itemHeaderRow}>
+                        <ScriptText script={item.script} size="medium" />
+                        <ReviewBadge status={item.status} />
+                      </View>
+                      <Text style={styles.translation}>{item.translations.de}</Text>
+                      {item.pronunciationHint ? <Text style={styles.hint}>{item.pronunciationHint}</Text> : null}
+                    </View>
+                  </FadeSlideIn>
+                );
+              })}
             </View>
           );
         }
@@ -74,15 +90,20 @@ export function LessonScreen({ route, navigation }: Props) {
           const notes = grammarByIds(pack, section.itemIds);
           return (
             <View key={idx} style={styles.sectionBlock}>
-              {notes.map((note) => (
-                <View key={note.id} style={styles.grammarCard}>
-                  <View style={styles.itemHeaderRow}>
-                    <Text style={styles.grammarTitle}>{note.titleDe}</Text>
-                    <ReviewBadge status={note.status} />
-                  </View>
-                  <Text style={styles.grammarText}>{note.explanationDe}</Text>
-                </View>
-              ))}
+              {notes.map((note) => {
+                const delay = Math.min(itemIndex++, MAX_STAGGER) * 45;
+                return (
+                  <FadeSlideIn key={note.id} delay={delay}>
+                    <View style={styles.grammarCard}>
+                      <View style={styles.itemHeaderRow}>
+                        <Text style={styles.grammarTitle}>{note.titleDe}</Text>
+                        <ReviewBadge status={note.status} />
+                      </View>
+                      <Text style={styles.grammarText}>{note.explanationDe}</Text>
+                    </View>
+                  </FadeSlideIn>
+                );
+              })}
             </View>
           );
         }
@@ -90,27 +111,34 @@ export function LessonScreen({ route, navigation }: Props) {
         const phrases = phrasesByIds(pack, section.itemIds);
         return (
           <View key={idx} style={styles.sectionBlock}>
-            {phrases.map((phrase) => (
-              <View key={phrase.id} style={styles.itemCard}>
-                <View style={styles.itemHeaderRow}>
-                  <ScriptText script={phrase.script} size="medium" />
-                  <ReviewBadge status={phrase.status} />
-                </View>
-                <Text style={styles.translation}>{phrase.translations.de}</Text>
-                <Text style={styles.translationEn}>{phrase.translations.en}</Text>
-                {phrase.literalTranslation ? (
-                  <Text style={styles.hint}>{phrase.literalTranslation.de}</Text>
-                ) : null}
-              </View>
-            ))}
+            {phrases.map((phrase) => {
+              const delay = Math.min(itemIndex++, MAX_STAGGER) * 45;
+              return (
+                <FadeSlideIn key={phrase.id} delay={delay}>
+                  <View style={styles.itemCard}>
+                    <View style={styles.itemHeaderRow}>
+                      <ScriptText script={phrase.script} size="medium" />
+                      <ReviewBadge status={phrase.status} />
+                    </View>
+                    <Text style={styles.translation}>{phrase.translations.de}</Text>
+                    <Text style={styles.translationEn}>{phrase.translations.en}</Text>
+                    {phrase.literalTranslation ? (
+                      <Text style={styles.hint}>{phrase.literalTranslation.de}</Text>
+                    ) : null}
+                  </View>
+                </FadeSlideIn>
+              );
+            })}
           </View>
         );
       })}
 
       <View style={styles.actions}>
-        <Pressable style={styles.completeButton} onPress={markCompleted}>
-          <Text style={styles.completeButtonText}>{completed ? 'Kammer studiert ✓' : 'Als studiert markieren'}</Text>
-        </Pressable>
+        <Animated.View style={justCompleted ? { transform: [{ scale: bounce }] } : undefined}>
+          <Pressable style={styles.completeButton} onPress={markCompleted}>
+            <Text style={styles.completeButtonText}>{completed ? 'Kammer studiert ✓' : 'Als studiert markieren'}</Text>
+          </Pressable>
+        </Animated.View>
         {hasQuizzableContent ? (
           <Pressable
             style={styles.quizButton}

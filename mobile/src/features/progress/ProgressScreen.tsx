@@ -8,6 +8,8 @@ import { getLanguagePack } from '../../data/languages';
 import { CatAvatar } from '../dungeon/CatAvatar';
 import { computeSootStage, SOOT_STAGE_LABELS_DE } from '../dungeon/dungeon';
 import { StoryScreen } from '../dungeon/StoryScreen';
+import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
+import { AnimatedBar } from '../../components/animations/AnimatedBar';
 
 const pack = getLanguagePack('mnk');
 
@@ -52,38 +54,46 @@ export function ProgressScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <View style={styles.avatarRow}>
-        <CatAvatar sootStage={sootStage} size={88} />
-        <View style={styles.avatarTextBlock}>
-          <Text style={styles.header}>Kungbäkola</Text>
-          <Text style={styles.sootLabel}>{SOOT_STAGE_LABELS_DE[sootStage]} vom Pyramidenstaub</Text>
-          <Pressable onPress={() => setStoryVisible(true)}>
-            <Text style={styles.storyLink}>Geschichte noch einmal ansehen</Text>
-          </Pressable>
+      <FadeSlideIn>
+        <View style={styles.avatarRow}>
+          <CatAvatar sootStage={sootStage} size={88} />
+          <View style={styles.avatarTextBlock}>
+            <Text style={styles.header}>Kungbäkola</Text>
+            <Text style={styles.sootLabel}>{SOOT_STAGE_LABELS_DE[sootStage]} vom Pyramidenstaub</Text>
+            <Pressable onPress={() => setStoryVisible(true)}>
+              <Text style={styles.storyLink}>Geschichte noch einmal ansehen</Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
+      </FadeSlideIn>
 
-      <View style={styles.row}>
-        <StatCard label="Streak" value={`${progress.currentStreak} 🔥`} sub={`Bestwert: ${progress.longestStreak}`} />
-        <StatCard label="Level" value={String(currentLevel)} sub={`${xpIntoLevel} / ${xpNeededForNext} XP`} />
-      </View>
-      <View style={styles.row}>
-        <StatCard label="Fällige Wiederholungen" value={String(dueCount)} sub="warten auf dich" />
-        <StatCard label="Kammern gelöst" value={String(completedLessonIds.length)} sub={`von ${pack.lessons.length}`} />
-      </View>
+      <FadeSlideIn delay={60}>
+        <View style={styles.row}>
+          <StatCard label="Streak" value={`${progress.currentStreak} 🔥`} sub={`Bestwert: ${progress.longestStreak}`} />
+          <StatCard label="Level" value={String(currentLevel)} sub={`${xpIntoLevel} / ${xpNeededForNext} XP`} />
+        </View>
+      </FadeSlideIn>
+      <FadeSlideIn delay={110}>
+        <View style={styles.row}>
+          <StatCard label="Fällige Wiederholungen" value={String(dueCount)} sub="warten auf dich" />
+          <StatCard label="Kammern gelöst" value={String(completedLessonIds.length)} sub={`von ${pack.lessons.length}`} />
+        </View>
+      </FadeSlideIn>
 
-      <View style={styles.levelBarTrack}>
-        <View style={[styles.levelBarFill, { width: `${Math.min(100, Math.round(levelProgressRatio * 100))}%` }]} />
+      <View style={styles.levelBarBlock}>
+        <AnimatedBar progress={levelProgressRatio} />
       </View>
 
       {dueCount > 0 ? (
-        <View style={styles.dueBlock}>
-          <Text style={styles.dueTitle}>Bereit zur Wiederholung</Text>
-          <Text style={styles.dueText}>
-            Öffne eine Kammer und löse das Rätsel erneut — fällige Vokabeln werden dabei automatisch
-            wiederholt.
-          </Text>
-        </View>
+        <FadeSlideIn delay={160}>
+          <View style={styles.dueBlock}>
+            <Text style={styles.dueTitle}>Bereit zur Wiederholung</Text>
+            <Text style={styles.dueText}>
+              Öffne eine Kammer und löse das Rätsel erneut — fällige Vokabeln werden dabei automatisch
+              wiederholt.
+            </Text>
+          </View>
+        </FadeSlideIn>
       ) : null}
 
       <Modal visible={storyVisible} animationType="slide" onRequestClose={() => setStoryVisible(false)}>
@@ -123,15 +133,7 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 12, color: colors.textMuted },
   statValue: { fontSize: 22, fontWeight: '700', color: colors.text, marginTop: 4 },
   statSub: { fontSize: 11, color: colors.textMuted, marginTop: 2 },
-  levelBarTrack: {
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.border,
-    overflow: 'hidden',
-    marginTop: 4,
-    marginBottom: 20,
-  },
-  levelBarFill: { height: '100%', backgroundColor: colors.primary },
+  levelBarBlock: { marginTop: 4, marginBottom: 20 },
   dueBlock: {
     backgroundColor: colors.warningBg,
     borderWidth: 1,
