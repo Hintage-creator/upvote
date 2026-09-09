@@ -7,12 +7,30 @@
 // reference (e.g. Saheeh International in English, Bubenheim & Elyas in
 // German) rather than relying on freehand phrasing.
 //
-// referenceAudioUrl is intentionally null: bundling Quran recitation audio
-// requires sourcing it from a rights-cleared provider (e.g. the quran.com or
-// everyayah.com recitation APIs) and is not something to fabricate here.
+// Verse recitation audio comes from everyayah.com, a site built specifically
+// to make per-ayah recitation files reusable in exactly this kind of app -
+// reciters agreed to have their recordings distributed this way, unlike a
+// random YouTube/TikTok upload where the actual rights holder and license
+// are usually impossible to verify. See README.md ("Referenz-Audio") for the
+// verification status of these URLs: they could not be checked from this
+// development sandbox because its network egress proxy blocks
+// everyayah.com outright, so confirm at least one URL resolves in a real
+// browser/device before shipping.
+//
+// There is no equivalent per-word audio source for the vocab list, so
+// VocabItem.referenceAudioUrl stays null - see README for options
+// (e.g. a TTS voice, or recording a native speaker directly).
 import type { Lesson, QuizQuestion, Verse, VocabItem } from "./types";
 
-export const VERSES: Verse[] = [
+const RECITER_FOLDER = "Alafasy_128kbps"; // Mishary Rashid Alafasy
+
+function everyayahUrl(surahNumber: number, ayahNumber: number): string {
+  const surah = String(surahNumber).padStart(3, "0");
+  const ayah = String(ayahNumber).padStart(3, "0");
+  return `https://everyayah.com/data/${RECITER_FOLDER}/${surah}${ayah}.mp3`;
+}
+
+const RAW_VERSES: Verse[] = [
   {
     id: "1:1",
     surahNumber: 1,
@@ -161,6 +179,11 @@ export const VERSES: Verse[] = [
     referenceAudioUrl: null,
   },
 ];
+
+export const VERSES: Verse[] = RAW_VERSES.map((verse) => ({
+  ...verse,
+  referenceAudioUrl: everyayahUrl(verse.surahNumber, verse.ayahNumber),
+}));
 
 export const VOCAB: VocabItem[] = [
   { id: "v-kitab", arabicWord: "كِتَاب", transliteration: "kitab", translationDe: "Buch", translationEn: "book", partOfSpeech: "noun", difficulty: 1, referenceAudioUrl: null },

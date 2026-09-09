@@ -85,13 +85,33 @@ Kontoentscheidung, die nur du treffen kannst.
 
 ## Referenz-Audio (Rezitationen von Muttersprachlern)
 
-`referenceAudioUrl` ist in allen Seed-Daten `null`. Koran-Rezitationsaudio ist
-urheberrechtlich geschütztes/zuzuordnendes Material (z. B. über die
-quran.com- oder everyayah.com-Recitation-APIs verfügbar) — das durfte ich hier
-nicht einfach erfinden oder verlinken. Um das UI vollständig zu machen: Audio
-von einem rechtlich geklärten Anbieter beziehen und die URL in
-`packages/shared/src/content.ts` eintragen; der Player (`ItemCard.tsx`) ist
-bereits fertig und aktiviert den Play-Button automatisch, sobald eine URL da ist.
+Für alle 11 Verse (Al-Fatiha, Al-Ikhlas) ist `referenceAudioUrl` in
+`packages/shared/src/content.ts` jetzt mit echten URLs zu
+[everyayah.com](https://everyayah.com) befüllt (Rezitator: Mishary Rashid
+Alafasy, `Alafasy_128kbps`). everyayah.com wurde bewusst gewählt, weil es
+genau für diesen Zweck aufgebaut ist — die Rezitatoren haben der
+Wiederverwendung ihrer Aufnahmen in Apps wie dieser zugestimmt, anders als
+ein beliebiger YouTube-/TikTok-Upload, bei dem Rechteinhaber und Lizenz sich
+in der Regel nicht verlässlich klären lassen (deshalb keine Downloads von
+dort — siehe Diskussion weiter oben in diesem Projekt).
+
+**Nicht verifiziert, ehrlich gesagt:** Diese Entwicklungsumgebung blockiert
+`everyayah.com` komplett über ihren Netzwerk-Proxy (sowohl `curl` als auch der
+Web-Fetch-Mechanismus schlugen mit "egress blocked" fehl) — ich konnte also
+keine einzige dieser URLs tatsächlich abrufen und prüfen. Das URL-Schema
+(`/data/{Rezitator}_{Bitrate}kbps/{Sure:3-stellig}{Vers:3-stellig}.mp3`) ist
+mir aus zahlreichen Open-Source-Quran-Projekten bekannt und ich bin
+zuversichtlich, dass es stimmt, aber das ersetzt keine echte Prüfung. **Bitte
+öffne mindestens eine URL (z. B.
+https://everyayah.com/data/Alafasy_128kbps/001001.mp3) im Browser, bevor du
+das ausrollst.** Ein echtes Gerät/eine echte Browser-Session ist von diesem
+Sandbox-Netzwerk-Block nicht betroffen — der Play-Button in `ItemCard.tsx`
+sollte dort direkt funktionieren.
+
+Für die **Vokabel-Liste** gibt es keine entsprechende Quelle — everyayah.com
+hat nur Vers-Audio, keine Einzelwort-Aussprache. `VocabItem.referenceAudioUrl`
+bleibt `null`. Optionen dafür: eine TTS-Stimme (z. B. Azure/Google TTS mit
+arabischer Stimme) oder eigene Aufnahmen mit einem Muttersprachler.
 
 ## Setup & Ausführen
 
@@ -122,7 +142,8 @@ blockiert, an dem die CLI sonst beim Start hängen bleibt.
   wird eine richtige Anmeldung (E-Mail/OAuth + Session-Token) gebraucht.
 - **Aussprache-Bewertung ist ein Platzhalter**, siehe oben — keine echte
   Phonem-Analyse ohne konfigurierten ASR-Anbieter.
-- **Keine Referenz-Audiodateien**, siehe oben — Lizenzfrage, nicht technisch.
+- **Vers-Referenzaudio ist jetzt verlinkt (everyayah.com), aber ungeprüft**
+  und **Vokabel-Referenzaudio fehlt komplett**, siehe oben.
 - **Der Audio-Aufnahme-Flow (Mikrofon → Aufnahme → Upload) konnte ich in
   dieser Sandbox nicht vollständig testen**, da hier weder ein Mikrofon noch
   ein Mobil-Simulator verfügbar ist. Verifiziert wurde: die App startet echt
