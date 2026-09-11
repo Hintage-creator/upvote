@@ -5,36 +5,37 @@ import { usePulse } from '../animations/usePulse';
 import { useWiggle } from '../animations/useWiggle';
 
 const SIZE = 64;
-/** Toe pads fill left-to-right, the main pad last — a lesson only looks "fully sooty" once truly done. */
-const SEGMENT_COUNT = 5;
+const TOE_STYLES = ['toe1', 'toe2', 'toe3', 'toe4'] as const;
 
 interface Props {
-  /** 0 = untouched, 1 = every item in the lesson has been reviewed at least once. */
-  progress: number;
+  /** How many pads/toes this paw has in total (one per room it covers) — 5 max: 4 toes + the main pad. */
+  totalSegments: number;
+  /** How many of those rooms are already completed — fills that many segments, toes first, main pad last. */
+  filledSegments: number;
   locked: boolean;
-  /** True once the lesson's quiz has been passed — always renders as a fully sooty paw with a checkmark. */
+  /** True once every room in this paw is done — always renders fully sooty with a checkmark. */
   completed: boolean;
-  /** The first unlocked, not-yet-completed lesson gets a gentle "play me" pulse. */
+  /** The paw containing the next playable, not-yet-completed room gets a gentle "play me" pulse. */
   isCurrent?: boolean;
   label: string | number;
 }
 
-export function PawNode({ progress, locked, completed, isCurrent = false, label }: Props) {
+export function PawNode({ totalSegments, filledSegments, locked, completed, isCurrent = false, label }: Props) {
   const pulseStyle = usePulse(1.07, 1100);
   const wiggleStyle = useWiggle(locked);
-  const filledSegments = completed ? SEGMENT_COUNT : Math.round(Math.max(0, Math.min(1, progress)) * SEGMENT_COUNT);
+  const toeCount = Math.max(0, Math.min(TOE_STYLES.length, totalSegments - 1));
+  const filled = completed ? totalSegments : Math.max(0, Math.min(totalSegments, filledSegments));
 
   const outerStyle = isCurrent ? pulseStyle : locked ? wiggleStyle : undefined;
 
   return (
     <Animated.View style={[styles.wrap, outerStyle]}>
       {isCurrent ? <View style={styles.currentRing} /> : null}
-      <Toe filled={!locked && filledSegments > 0} style={styles.toe1} />
-      <Toe filled={!locked && filledSegments > 1} style={styles.toe2} />
-      <Toe filled={!locked && filledSegments > 2} style={styles.toe3} />
-      <Toe filled={!locked && filledSegments > 3} style={styles.toe4} />
-      <View style={[styles.pad, !locked && filledSegments > 4 && styles.padFilled]}>
-        <Text style={[styles.label, !locked && filledSegments > 4 && styles.labelOnDark]}>
+      {TOE_STYLES.slice(0, toeCount).map((styleKey, i) => (
+        <Toe key={styleKey} filled={!locked && filled > i} style={styles[styleKey]} />
+      ))}
+      <View style={[styles.pad, !locked && filled > toeCount && styles.padFilled]}>
+        <Text style={[styles.label, !locked && filled > toeCount && styles.labelOnDark]}>
           {locked ? '🔒' : completed ? '✓' : label}
         </Text>
       </View>

@@ -4,9 +4,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Alert, Animated, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { getLanguagePack } from '../../data/languages';
-import { lessonItemIds, unitsSorted } from '../../data/contentLookup';
 import { CourseStackParamList } from '../../navigation/types';
-import { isLessonUnlocked, orderedLessons } from '../dungeon/dungeon';
+import { isLessonUnlocked, orderedLessons, pawGroups } from '../dungeon/dungeon';
 import { progressRepository } from '../progress';
 import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
 import { useShake } from '../../components/animations/useShake';
@@ -18,27 +17,19 @@ type Props = NativeStackScreenProps<CourseStackParamList, 'CourseList'>;
 
 const pack = getLanguagePack('mnk');
 
-/** Horizontal offset per path position, cycling every 4 rooms — the same gentle S-curve Duolingo uses for its unit path. */
+/** Horizontal offset per path position, cycling every 4 paws — the same gentle S-curve Duolingo uses for its unit path. */
 const ZIGZAG: Array<'center' | 'right' | 'left'> = ['center', 'right', 'center', 'left'];
 
 export function CourseListScreen({ navigation }: Props) {
-  const units = unitsSorted(pack);
-  const unitTitleById = new Map(units.map((u) => [u.id, `Kammer ${u.order} · ${u.titleDe}`]));
-  const lessons = orderedLessons(pack);
-
+  const groups = pawGroups(pack);
   const [completedLessonIds, setCompletedLessonIds] = useState<string[] | null>(null);
-  const [reviewedItemIds, setReviewedItemIds] = useState<Set<string>>(new Set());
 
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
-      Promise.all([progressRepository.getCompletedLessonIds(), progressRepository.getAllReviewStates()]).then(
-        ([ids, reviewStates]) => {
-          if (cancelled) return;
-          setCompletedLessonIds(ids);
-          setReviewedItemIds(new Set(reviewStates.map((s) => s.itemId)));
-        }
-      );
+      progressRepository.getCompletedLessonIds().then((ids) => {
+        if (!cancelled) setCompletedLessonIds(ids);
+      });
       return () => {
         cancelled = true;
       };
@@ -46,11 +37,10 @@ export function CourseListScreen({ navigation }: Props) {
   );
 
   const completed = completedLessonIds ?? [];
-  const firstPlayableIndex = lessons.findIndex(
+  const allLessons = orderedLessons(pack);
+  const firstPlayableLesson = allLessons.find(
     (l) => !completed.includes(l.id) && (completedLessonIds === null || isLessonUnlocked(pack, l.id, completed))
   );
-
-  let previousUnitId: string | null = null;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
@@ -58,55 +48,52 @@ export function CourseListScreen({ navigation }: Props) {
         <Text style={styles.header}>Die Pyramide</Text>
         <Text style={styles.subheader}>
           Kungbäkola sitzt fest. Löse die Rätsel Kammer für Kammer, um tiefer vorzudringen — und
-          irgendwann wieder hinauszufinden. Ihre Pfoten werden rußiger, je mehr sie löst.
+          irgendwann wieder hinauszufinden. Jede gelöste Kammer schwärzt eine ihrer Pfotenzehen.
         </Text>
       </FadeSlideIn>
 
-      {lessons.map((lesson, index) => {
-        const showUnitHeader = lesson.unitId !== previousUnitId;
-        previousUnitId = lesson.unitId;
-        const unlocked = completedLessonIds === null || isLessonUnlocked(pack, lesson.id, completed);
-        const isCompleted = completed.includes(lesson.id);
-        const itemIds = lessonItemIds(lesson);
-        const reviewedCount = itemIds.filter((id) => reviewedItemIds.has(id)).length;
-        const progress = itemIds.length > 0 ? reviewedCount / itemIds.length : 0;
+      {groups.map((group, index) => {
+        const unlocked = completedLessonIds === null || isLessonUnlocked(pack, group[0].id, completed);
+        const filledSegments = group.filter((l) => completed.includes(l.id)).length;
+        const isCompleted = filledSegments === group.length;
+        const isCurrent = group.some((l) => l.id === firstPlayableLesson?.id);
+        const targetLesson = group.find((l) => !completed.includes(l.id)) ?? group[0];
 
         return (
-          <React.Fragment key={lesson.id}>
-            {showUnitHeader ? (
-              <Text style={styles.unitTitle}>{unitTitleById.get(lesson.unitId)}</Text>
-            ) : null}
-            <PathStop
-              lesson={lesson}
-              unlocked={unlocked}
-              isCompleted={isCompleted}
-              progress={progress}
-              isCurrent={index === firstPlayableIndex}
-              position={ZIGZAG[index % ZIGZAG.length]}
-              index={index}
-              onPress={() => navigation.navigate('Lesson', { lessonId: lesson.id })}
-            />
-          </React.Fragment>
+          <PawStop
+            key={group[0].id}
+            groupNumber={index + 1}
+            totalSegments={group.length}
+            filledSegments={filledSegments}
+            unlocked={unlocked}
+            isCompleted={isCompleted}
+            isCurrent={unlocked && isCurrent}
+            position={ZIGZAG[index % ZIGZAG.length]}
+            index={index}
+            onPress={() => navigation.navigate('Lesson', { lessonId: targetLesson.id })}
+          />
         );
       })}
     </ScrollView>
   );
 }
 
-function PathStop({
-  lesson,
+function PawStop({
+  groupNumber,
+  totalSegments,
+  filledSegments,
   unlocked,
   isCompleted,
-  progress,
   isCurrent,
   position,
   index,
   onPress,
 }: {
-  lesson: Lesson;
+  groupNumber: number;
+  totalSegments: number;
+  filledSegments: number;
   unlocked: boolean;
   isCompleted: boolean;
-  progress: number;
   isCurrent: boolean;
   position: 'center' | 'left' | 'right';
   index: number;
@@ -138,15 +125,14 @@ function PathStop({
             accessibilityRole="button"
           >
             <PawNode
-              progress={progress}
+              totalSegments={totalSegments}
+              filledSegments={filledSegments}
               locked={!unlocked}
               completed={isCompleted}
-              isCurrent={unlocked && isCurrent}
-              label={lesson.level}
+              isCurrent={isCurrent}
+              label={groupNumber}
             />
-            <Text style={[styles.stopTitle, !unlocked && styles.textLocked]} numberOfLines={2}>
-              {lesson.titleDe}
-            </Text>
+            <Text style={[styles.stopTitle, !unlocked && styles.textLocked]}>Kammer {groupNumber}</Text>
           </AnimatedPressable>
         </Animated.View>
       </View>
@@ -159,7 +145,6 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 32 },
   header: { fontSize: 26, fontWeight: '700', color: colors.text },
   subheader: { fontSize: 13, color: colors.textMuted, marginTop: 4, marginBottom: 24, lineHeight: 18 },
-  unitTitle: { fontSize: 16, fontWeight: '700', color: colors.primaryDark, marginTop: 8, marginBottom: 14 },
   stopRow: { width: '100%', alignItems: 'center', marginBottom: 6 },
   stopRowRight: { alignItems: 'flex-end', paddingRight: '12%' },
   stopRowLeft: { alignItems: 'flex-start', paddingLeft: '12%' },

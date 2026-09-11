@@ -190,18 +190,26 @@ verarbeitet mit Pillow (Python), Skript nicht Teil des Repos:
   Wortgrenzen bei mehrwortigen Phrasen stimmen mit der lateinischen Vorlage
   überein.
 - **Pfoten-Pfad statt Kartenliste** auf dem Kurs-Screen (`CourseListScreen` +
-  neue `PawNode`-Komponente): ein Duolingo-artiger, geschwungener Pfad aus
-  Katzenpfoten-Icons statt der flachen Lektionsliste. Pro Lektion füllen sich
-  die vier Zehen und der Ballen der Pfote (5 Segmente) proportional zum Anteil
-  der in dieser Lektion bereits im Quiz abgefragten Vokabeln/Phrasen mit Ruß
-  (schwarz statt beige) — Datenquelle ist die ohnehin pro Item gespeicherte
-  `ReviewState` aus dem SRS-System, kein neues Speicherformat nötig. Gesperrte
-  Lektionen zeigen ein wackelndes Schloss, die aktuell spielbare Lektion einen
-  pulsierenden Ring. Per Playwright geprüft: Pfad rendert korrekt, Tippen auf
-  Icon oder Titel öffnet die Lektion (ein erster Implementierungsversuch hatte
-  hier einen Bug — nur das Icon, nicht der Titeltext, war antippbar — wurde
-  gefunden und behoben), und nach drei teilweise beantworteten Quizfragen
-  füllen sich sichtbar zwei der fünf Pfoten-Segmente schwarz.
+  neue `PawNode`-Komponente, Gruppierung über `pawGroups()` in `dungeon.ts`):
+  ein Duolingo-artiger, geschwungener Pfad aus Katzenpfoten-Icons statt der
+  flachen Lektionsliste. Je 5 Kammern (`PAW_GROUP_SIZE`) werden zu einer
+  Pfote zusammengefasst — eine Pfote hat 4 Zehen + 1 Ballen, also genau 5
+  Segmente — und mit jeder abgeschlossenen Kammer aus dieser Fünfergruppe
+  schwärzt sich ein weiteres Segment (Ruß statt Beige), bis die ganze Pfote
+  schwarz ist. Tippen auf eine Pfote öffnet die erste noch offene Kammer
+  darin; ist die Gruppe noch gesperrt (erste Kammer noch nicht erreicht),
+  wackelt sie mit Schloss-Symbol und einem Alert statt zu navigieren. Die
+  Pfote mit der aktuell spielbaren Kammer bekommt einen pulsierenden Ring.
+  Per Playwright End-to-End geprüft: Pfad rendert, Tippen auf die (aktuell
+  einzige) Pfote „Kammer 1" öffnet „Die Vokale" korrekt, nach Abschluss
+  dieser einen Lektion (Quiz durchgespielt) zeigt die Pfote sichtbar genau
+  ein geschwärztes Segment von fünf. Ein erster Implementierungsversuch
+  (Pfote = einzelne Lektion, Füllstand nach Quiz-Fortschritt statt nach
+  Kammer-Anzahl) wurde nach Nutzer-Feedback zu diesem Design verworfen und
+  durch das jetzige 5-Kammern-pro-Pfote-Modell ersetzt — dabei fiel auch ein
+  Tap-Target-Bug auf (nur das Icon, nicht der Titeltext, war antippbar), der
+  mitbehoben wurde. Jest deckt `pawGroups()` ab (volle Fünfergruppe, kürzere
+  Restgruppe, leeres Paket).
 
 ## Was nicht verifiziert wurde
 

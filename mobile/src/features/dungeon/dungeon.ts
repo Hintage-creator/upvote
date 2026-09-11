@@ -42,3 +42,21 @@ export function computeSootStage(completedLessonIds: string[], totalLessons: num
 }
 
 export const SOOT_STAGE_LABELS_DE = ['Sauber', 'Staubig', 'Aschfahl', 'Rußbedeckt', 'Pechschwarz'];
+
+/** A cat paw has 5 pads (4 toes + 1 main pad) — one "paw" on the path covers this many rooms. */
+export const PAW_GROUP_SIZE = 5;
+
+/**
+ * Chunks the global room order into groups of `PAW_GROUP_SIZE` — each group
+ * is shown as a single paw on the course path, with one pad/toe blackening
+ * per room completed inside it. The last group may be smaller than 5 if the
+ * total room count isn't a multiple of it.
+ */
+export function pawGroups(pack: LanguagePack): Lesson[][] {
+  const lessons = orderedLessons(pack);
+  const groups: Lesson[][] = [];
+  for (let i = 0; i < lessons.length; i += PAW_GROUP_SIZE) {
+    groups.push(lessons.slice(i, i + PAW_GROUP_SIZE));
+  }
+  return groups;
+}

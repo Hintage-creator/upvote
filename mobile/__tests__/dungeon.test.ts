@@ -1,5 +1,12 @@
 import { LanguagePack } from '../src/types/content';
-import { computeSootStage, isLessonUnlocked, orderedLessons, SOOT_STAGE_COUNT } from '../src/features/dungeon/dungeon';
+import {
+  computeSootStage,
+  isLessonUnlocked,
+  orderedLessons,
+  pawGroups,
+  PAW_GROUP_SIZE,
+  SOOT_STAGE_COUNT,
+} from '../src/features/dungeon/dungeon';
 
 function makePack(lessonOrders: number[]): LanguagePack {
   return {
@@ -73,5 +80,27 @@ describe('computeSootStage', () => {
 
   it('is stage 0 when there are no lessons at all', () => {
     expect(computeSootStage([], 0)).toBe(0);
+  });
+});
+
+describe('pawGroups', () => {
+  it('puts exactly PAW_GROUP_SIZE rooms in one paw', () => {
+    const pack = makePack([1, 2, 3, 4, 5]);
+    const groups = pawGroups(pack);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]).toHaveLength(PAW_GROUP_SIZE);
+    expect(groups[0].map((l) => l.id)).toEqual(['l1', 'l2', 'l3', 'l4', 'l5']);
+  });
+
+  it('starts a new paw once a group is full, leaving a shorter last group', () => {
+    const pack = makePack([1, 2, 3, 4, 5, 6, 7]);
+    const groups = pawGroups(pack);
+    expect(groups).toHaveLength(2);
+    expect(groups[0]).toHaveLength(5);
+    expect(groups[1].map((l) => l.id)).toEqual(['l6', 'l7']);
+  });
+
+  it('is empty for a pack with no lessons', () => {
+    expect(pawGroups(makePack([]))).toEqual([]);
   });
 });
