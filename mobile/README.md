@@ -210,6 +210,17 @@ verarbeitet mit Pillow (Python), Skript nicht Teil des Repos:
   Tap-Target-Bug auf (nur das Icon, nicht der Titeltext, war antippbar), der
   mitbehoben wurde. Jest deckt `pawGroups()` ab (volle Fünfergruppe, kürzere
   Restgruppe, leeres Paket).
+- **Zukünftige Pfoten sind bereits "angeteasert"**, bevor sie erreichbar sind
+  (wie Duolingos Pfad, der auch weiter unten liegende, gesperrte Übungen
+  schon zeigt): `CourseListScreen` rendert alle `pawGroups()` unabhängig vom
+  Sperrstatus, gesperrte zeigen nur ein wackelndes Schloss und „Kammer N" —
+  nie Lektionstitel oder -inhalte. Mit den aktuell nur 5 Lektionen gibt es
+  dafür noch nichts zu sehen (nur eine Pfote existiert); der Mechanismus
+  wurde daher mit zwei temporären Test-Lektionen (Duplikate bestehender
+  Item-IDs, nicht committet) verifiziert — Kammer 2 erschien korrekt
+  gesperrt neben der freigeschalteten Kammer 1 — und zusätzlich mit einem
+  dedizierten Jest-Test (`pawGroups + isLessonUnlocked (path teasing)`)
+  dauerhaft abgesichert.
 
 ## Was nicht verifiziert wurde
 

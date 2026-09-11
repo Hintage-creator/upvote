@@ -104,3 +104,20 @@ describe('pawGroups', () => {
     expect(pawGroups(makePack([]))).toEqual([]);
   });
 });
+
+describe('pawGroups + isLessonUnlocked (path teasing)', () => {
+  it('shows a later paw on the path while keeping it locked until the previous one is done', () => {
+    const pack = makePack([1, 2, 3, 4, 5, 6, 7]);
+    const groups = pawGroups(pack);
+    expect(groups).toHaveLength(2);
+
+    // Nothing done yet: only the first paw is enterable, the second is still
+    // visible (so it can be "teased" in the UI) but locked.
+    expect(isLessonUnlocked(pack, groups[0][0].id, [])).toBe(true);
+    expect(isLessonUnlocked(pack, groups[1][0].id, [])).toBe(false);
+
+    // Finishing every room in the first paw unlocks the second.
+    const firstPawDone = groups[0].map((l) => l.id);
+    expect(isLessonUnlocked(pack, groups[1][0].id, firstPawDone)).toBe(true);
+  });
+});
