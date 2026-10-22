@@ -1,0 +1,115 @@
+import { PhraseItem, VocabItem } from '../../../types/content';
+
+const REVIEW_NOTE =
+  'Allgemein in der Manding-Linguistik belegte Form (Bambara-nah); für Guinea-Maninka noch nicht verifiziert.';
+
+export const pronounItems: VocabItem[] = [
+  {
+    id: 'mnk-pronoun-1',
+    languageCode: 'mnk',
+    script: { latin: 'n', nko: 'ߒ' },
+    translations: { de: 'ich', en: 'I' },
+    partOfSpeech: 'pronoun',
+    status: { needsReview: true, note: REVIEW_NOTE },
+    tags: ['pronouns'],
+  },
+  {
+    id: 'mnk-pronoun-2',
+    languageCode: 'mnk',
+    script: { latin: 'i', nko: 'ߌ' },
+    translations: { de: 'du', en: 'you (sg.)' },
+    partOfSpeech: 'pronoun',
+    status: { needsReview: true, note: REVIEW_NOTE },
+    tags: ['pronouns'],
+  },
+  {
+    id: 'mnk-pronoun-3',
+    languageCode: 'mnk',
+    script: { latin: 'a', nko: 'ߊ' },
+    translations: { de: 'er/sie/es', en: 'he/she/it' },
+    partOfSpeech: 'pronoun',
+    status: { needsReview: true, note: REVIEW_NOTE },
+    tags: ['pronouns'],
+  },
+  {
+    id: 'mnk-pronoun-4',
+    languageCode: 'mnk',
+    script: { latin: 'an', nko: 'ߊߣ' },
+    translations: { de: 'wir', en: 'we' },
+    partOfSpeech: 'pronoun',
+    status: { needsReview: true, note: REVIEW_NOTE },
+    tags: ['pronouns'],
+  },
+  {
+    id: 'mnk-pronoun-5',
+    languageCode: 'mnk',
+    script: { latin: 'aw', nko: 'ߊߥ' },
+    translations: { de: 'ihr', en: 'you (pl.)' },
+    partOfSpeech: 'pronoun',
+    status: { needsReview: true, note: REVIEW_NOTE },
+    tags: ['pronouns'],
+  },
+  {
+    id: 'mnk-pronoun-6',
+    languageCode: 'mnk',
+    script: { latin: 'u', nko: 'ߎ' },
+    translations: { de: 'sie (Plural)', en: 'they' },
+    partOfSpeech: 'pronoun',
+    status: { needsReview: true, note: REVIEW_NOTE },
+    tags: ['pronouns'],
+  },
+];
+
+export const greetingPhrases: PhraseItem[] = [
+  {
+    id: 'mnk-phrase-1',
+    languageCode: 'mnk',
+    script: { latin: 'I ni sɔgɔma', nko: 'ߌ ߣߌ ߛߐߜߐߡߊ' },
+    translations: { de: 'Guten Morgen', en: 'Good morning' },
+    literalTranslation: { de: 'wörtlich: „du und Morgen“', en: 'literally: "you and morning"' },
+    category: 'greetings',
+    status: { needsReview: true, note: REVIEW_NOTE },
+  },
+  {
+    id: 'mnk-phrase-2',
+    languageCode: 'mnk',
+    script: { latin: 'I ni wula', nko: 'ߌ ߣߌ ߥߎߟߊ' },
+    translations: { de: 'Guten Abend', en: 'Good evening' },
+    literalTranslation: { de: 'wörtlich: „du und Abend“', en: 'literally: "you and evening"' },
+    category: 'greetings',
+    status: { needsReview: true, note: REVIEW_NOTE },
+  },
+  {
+    id: 'mnk-phrase-3',
+    languageCode: 'mnk',
+    script: { latin: 'I ka kɛnɛ wa?', nko: 'ߌ ߞߊ ߞߍߣߍ ߥߊ؟' },
+    translations: { de: 'Wie geht es dir?', en: 'How are you?' },
+    literalTranslation: { de: 'wörtlich: „bist du klar/gesund?“', en: 'literally: "are you clear/well?"' },
+    category: 'greetings',
+    status: { needsReview: true, note: REVIEW_NOTE },
+  },
+  {
+    id: 'mnk-phrase-4',
+    languageCode: 'mnk',
+    script: { latin: 'Aw ni ce', nko: 'ߊߥ ߣߌ ߗߋ' },
+    translations: { de: 'Danke (an mehrere Personen / formell)', en: 'Thank you (plural/formal)' },
+    category: 'greetings',
+    status: { needsReview: true, note: REVIEW_NOTE },
+  },
+  {
+    id: 'mnk-phrase-5',
+    languageCode: 'mnk',
+    script: { latin: 'Ɛɛ', nko: 'ߍߍ' },
+    translations: { de: 'Ja', en: 'Yes' },
+    category: 'basics',
+    status: { needsReview: true, note: REVIEW_NOTE },
+  },
+  {
+    id: 'mnk-phrase-6',
+    languageCode: 'mnk',
+    script: { latin: 'Ayi', nko: 'ߊߦߌ' },
+    translations: { de: 'Nein', en: 'No' },
+    category: 'basics',
+    status: { needsReview: true, note: REVIEW_NOTE },
+  },
+];
