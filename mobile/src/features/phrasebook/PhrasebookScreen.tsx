@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
+import { cardShadow } from '../../theme/shadows';
 import { getLanguagePack } from '../../data/languages';
 import { phrasesByCategory } from '../../data/contentLookup';
 import { ScriptText } from '../script/ScriptText';
@@ -73,6 +74,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     marginBottom: 8,
+    ...cardShadow,
   },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 },
   de: { fontSize: 14, color: colors.text, marginTop: 6 },

@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
+import { cardShadow } from '../../theme/shadows';
 import { progressRepository } from './index';
 import { UserProgress, xpToNextLevel } from './srs';
 import { getLanguagePack } from '../../data/languages';
@@ -131,6 +132,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 12,
     padding: 14,
+    ...cardShadow,
   },
   statLabel: { fontSize: 12, color: colors.textMuted },
   statValue: { fontSize: 22, fontWeight: '700', color: colors.text, marginTop: 4 },
@@ -142,6 +144,7 @@ const styles = StyleSheet.create({
     borderColor: colors.warningBorder,
     borderRadius: 12,
     padding: 14,
+    ...cardShadow,
   },
   dueTitle: { fontWeight: '700', color: colors.warningText, marginBottom: 4 },
   dueText: { fontSize: 13, color: colors.warningText },

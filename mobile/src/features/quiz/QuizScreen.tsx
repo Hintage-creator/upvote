@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Animated, StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors } from '../../theme/colors';
+import { cardShadow } from '../../theme/shadows';
 import { getLanguagePack } from '../../data/languages';
 import { lessonById, lessonItemIds, phrasesByIds, vocabByIds } from '../../data/contentLookup';
 import { CourseStackParamList } from '../../navigation/types';
@@ -267,6 +268,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     position: 'relative',
+    ...cardShadow,
   },
   promptHint: { fontSize: 12, color: colors.textMuted, marginTop: 10 },
   choices: { gap: 10 },
@@ -276,6 +278,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 10,
     padding: 14,
+    ...cardShadow,
   },
   choiceCorrect: { backgroundColor: '#E4F3EA', borderColor: colors.success },
   choiceWrong: { backgroundColor: '#FBE7E5', borderColor: colors.danger },

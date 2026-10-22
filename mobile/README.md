@@ -221,6 +221,28 @@ verarbeitet mit Pillow (Python), Skript nicht Teil des Repos:
   gesperrt neben der freigeschalteten Kammer 1 — und zusätzlich mit einem
   dedizierten Jest-Test (`pawGroups + isLessonUnlocked (path teasing)`)
   dauerhaft abgesichert.
+- **Design-Politur-Durchgang** (Layout wirkte "unprofessionell"): Dabei
+  einen echten Bug gefunden und behoben — das Katzen-Titelbild auf dem
+  Story-Screen (`StoryScreen.tsx`) war auf Web unsichtbar bzw. stark
+  verzerrt/zu nah herangezoomt. Ursache: `react-native-web`s `Image`-
+  Komponente setzt intern eine inline Pixel-Höhe aus der natürlichen
+  Bildgröße, sobald kein expliziter `height`-Wert im Style steht — das
+  überschreibt lautlos die `aspectRatio`-Vorgabe aus dem Stylesheet, UND
+  die `width: '100%'` löste sich falsch auf, weil der `FadeSlideIn`-
+  Wrapper um das Bild nicht `alignSelf: 'stretch'` hatte (die Absätze
+  darunter hatten das längst, das Bild nicht). Fix: Höhe wird jetzt aus
+  `useWindowDimensions()` berechnet statt über `aspectRatio`, Wrapper
+  bekommt `alignSelf: 'stretch'`. Per Playwright-Vorher/Nachher-Screenshot
+  bestätigt (vorher: leerer Fleck bzw. stark zugeschnittenes Gesicht;
+  nachher: komplette Illustration korrekt proportioniert).
+  Zusätzlich: doppelte „Die Pyramide"-Überschrift auf dem Kurs-Screen
+  entfernt (Stack-Navigator-Header UND eigener In-Content-Titel zeigten
+  denselben Text — jetzt ist der native Header für diesen einen Screen
+  deaktiviert, Lesson/Quiz behalten ihren Header mit Zurück-Pfeil). Und:
+  allen Karten-artigen Flächen (Vokabel-/Grammatik-Karten, Quiz-Prompt und
+  -Antwortkarten, Fortschritts-Kacheln, Phrasenbuch-Karten) eine
+  einheitliche, dezente `boxShadow` spendiert (`theme/shadows.ts`) — vorher
+  komplett flach, nur 1px-Rahmen, kein Tiefengefühl.
 
 ## Was nicht verifiziert wurde
 

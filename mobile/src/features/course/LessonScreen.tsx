@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Animated, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
+import { cardShadow } from '../../theme/shadows';
 import { getLanguagePack } from '../../data/languages';
 import { grammarByIds, lessonById, phrasesByIds, vocabByIds } from '../../data/contentLookup';
 import { CourseStackParamList } from '../../navigation/types';
@@ -180,6 +181,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 12,
     padding: 12,
+    ...cardShadow,
   },
   itemHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 },
   translation: { fontSize: 14, color: colors.text, marginTop: 6 },
@@ -191,6 +193,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 12,
     padding: 12,
+    ...cardShadow,
   },
   grammarTitle: { fontSize: 15, fontWeight: '700', color: colors.primaryDark, flex: 1 },
   grammarText: { fontSize: 14, color: colors.text, marginTop: 6, lineHeight: 20 },

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { FadeSlideIn } from '../../components/animations/FadeSlideIn';
 import { AnimatedPressable } from '../../components/animations/AnimatedPressable';
@@ -8,6 +8,9 @@ interface Props {
   onDone: () => void;
   buttonLabel?: string;
 }
+
+const ILLUSTRATION_ASPECT_RATIO = 1.15; // width / height
+const CONTENT_HORIZONTAL_PADDING = 20; // matches styles.content.padding, both sides
 
 const PARAGRAPHS = [
   'Irgendwo am Rand der Sahara streunt eine kleine getigerte Katze durch den Sand — auf der Suche nach Schatten, nach Wasser, nach irgendetwas Vertrautem.',
@@ -22,13 +25,19 @@ const PARAGRAPHS = [
  * Illustration is the user-supplied "standing" concept artwork.
  */
 export function StoryScreen({ onDone, buttonLabel = 'Die Pyramide betreten' }: Props) {
+  const { width: windowWidth } = useWindowDimensions();
+  // react-native-web's Image sets an inline pixel height from the asset's
+  // natural size whenever no explicit numeric height is given, which silently
+  // overrides an `aspectRatio` style — so the height is computed here instead.
+  const illustrationHeight = Math.round((windowWidth - CONTENT_HORIZONTAL_PADDING * 2) / ILLUSTRATION_ASPECT_RATIO);
+
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
-        <FadeSlideIn distance={20}>
+        <FadeSlideIn distance={20} style={styles.illustrationWrap}>
           <Image
             source={require('../../../assets/mascot/story-standing.png')}
-            style={styles.illustration}
+            style={[styles.illustration, { height: illustrationHeight }]}
             resizeMode="cover"
           />
         </FadeSlideIn>
@@ -53,9 +62,9 @@ export function StoryScreen({ onDone, buttonLabel = 'Die Pyramide betreten' }: P
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   content: { padding: 20, paddingBottom: 12, alignItems: 'center' },
+  illustrationWrap: { alignSelf: 'stretch' },
   illustration: {
     width: '100%',
-    aspectRatio: 1.15,
     borderRadius: 16,
     marginBottom: 16,
   },
