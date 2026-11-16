@@ -143,9 +143,17 @@ Upvote soll deshalb ein eigenes Feedback-System etablieren.
 
 ### 3.1 Die drei Feedback-Kategorien
 
-Jeder Creator muss zunächst seine eigene Einschätzung abgeben.
+> [!important] Grundregel: Erst bewerten, dann hochladen
+> Bevor ein Creator ein eigenes Video hochladen darf, muss er zuerst Videos anderer Creator bewerten.
+>
+> **Warum?** Sonst laden alle nur ihre eigenen Videos hoch und warten auf Feedback, ohne selbst welches zu geben, und am Ende bekommt niemand eine Bewertung. Die Regel stellt sicher, dass jedes hochgeladene Video auch tatsächlich Bewertungen erhält.
+>
+> **Noch offen:** Wie viele Bewertungen pro Upload nötig sind, ob die Regel für jeden Upload gilt oder nur für den ersten, und wie sie mit den Feedback-Credits (siehe Kapitel 11.1) zusammenspielt.
 
-Die drei grundlegenden Kategorien:
+> [!warning] Startproblem dieser Regel
+> Die allerersten Nutzer finden noch keine Videos vor, die sie bewerten könnten. Zum Start braucht es deshalb einen Grundbestand an Videos, zum Beispiel vom Gründerteam oder von gezielt eingeladenen Creatorn.
+
+Jede Bewertung erfolgt in drei grundlegenden Kategorien:
 
 #### POSITIV – Gut, weil …
 
