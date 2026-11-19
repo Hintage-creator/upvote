@@ -691,24 +691,22 @@ Beispiel:
 | Qualifizierte Bewertung | +1 |
 | Detaillierte Bewertung | +2 |
 | Bewertung als hilfreich markiert | +1 |
-| Tägliches Einloggen (geschenkte Credits) | +1 pro Tag |
+| Täglicher Bonus (nur an Tagen mit eigenem Post) | +1 pro Tag |
 | Eigenes Video testen | -5 |
 
 > [!note]
 > Die Zahlen sind lediglich ein Modellbeispiel.
 
-#### Geschenkte Credits für regelmäßiges Einloggen
+#### Geschenkte Daily Credits
 
-Wer sich regelmäßig einloggt, bekommt täglich eine kleine Menge Credits geschenkt. Das soll Nutzer dazu bringen, häufig zurückzukommen, und hält die Plattform aktiv.
+Nutzer bekommen täglich eine kleine Menge Credits geschenkt, **aber nur an Tagen, an denen sie selbst etwas gepostet haben.**
 
-> [!warning] Spannung mit der Grundregel „Erst bewerten, dann hochladen“
-> Login-Credits belohnen das Einloggen, nicht das Feedback. Sind sie zu großzügig, kann jemand allein durch Einloggen genug Credits für einen Upload sammeln, ohne je ein Video bewertet zu haben. Damit wäre die Grundregel aus Kapitel 3.1 ausgehebelt.
->
-> Mögliche Absicherungen (noch zu entscheiden):
-> - Login-Credits bleiben klein im Verhältnis zu den Kosten eines Uploads.
-> - Obergrenze für Login-Credits pro Woche.
-> - Ein Upload erfordert zusätzlich eine Mindestzahl eigener Bewertungen, unabhängig vom Credit-Stand.
-> - Login-Credits gibt es erst, nachdem der Nutzer an dem Tag ein Video bewertet hat.
+Da ein Post Credits kostet, die man nur durch Bewertungen anderer Videos verdient, kann man die Daily Credits nicht ohne vorherige Bewertungen bekommen. Die Grundregel „Erst bewerten, dann hochladen“ (Kapitel 3.1) bleibt damit intakt.
+
+> [!warning] Nebenwirkungen, die beobachtet werden müssen
+> - **Der Bonus macht Posten billiger.** Mit den Beispielzahlen kostet ein Upload effektiv nur noch 4 statt 5 Credits. Pro Video entsteht also etwas weniger Feedback-Pflicht. Die Upload-Kosten müssen so gewählt sein, dass trotzdem jedes Video genügend Bewertungen bekommt.
+> - **Belohnt wird Posten, nicht Zurückkommen.** Nutzer, die nur bewerten, aber an dem Tag nichts posten, erhalten nichts. Gerade diese Feedbackgeber braucht die Plattform aber.
+> - **Anreiz zu täglichem Posten.** Das kann zu schnell produzierten, schwächeren Videos führen, die Feedback binden. Die Beispiel-Persona postet 3–5 Videos pro Woche, nicht täglich.
 
 Wichtig ist, dass die Nutzer nicht einfach möglichst viele Bewertungen abgeben, sondern hilfreiche Bewertungen.
 
