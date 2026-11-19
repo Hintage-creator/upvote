@@ -148,7 +148,9 @@ Upvote soll deshalb ein eigenes Feedback-System etablieren.
 >
 > **Warum?** Sonst laden alle nur ihre eigenen Videos hoch und warten auf Feedback, ohne selbst welches zu geben, und am Ende bekommt niemand eine Bewertung. Die Regel stellt sicher, dass jedes hochgeladene Video auch tatsächlich Bewertungen erhält.
 >
-> **Noch offen:** Wie viele Bewertungen pro Upload nötig sind, ob die Regel für jeden Upload gilt oder nur für den ersten, und wie sie mit den Feedback-Credits (siehe Kapitel 11.1) zusammenspielt.
+> **Noch offen:** Wie viele Bewertungen pro Upload nötig sind, ob die Regel für jeden Upload gilt oder nur für den ersten.
+>
+> Die Regel wird über das Credit-System umgesetzt (siehe Kapitel 11.1): Bewertungen bringen Credits, ein Upload kostet Credits.
 
 > [!warning] Startproblem dieser Regel
 > Die allerersten Nutzer finden noch keine Videos vor, die sie bewerten könnten. Zum Start braucht es deshalb einen Grundbestand an Videos, zum Beispiel vom Gründerteam oder von gezielt eingeladenen Creatorn.
@@ -661,7 +663,7 @@ Das könnte zu folgendem Problem führen:
 
 > [!danger] Das wäre für Upvote fatal.
 
-### 11.1 Mögliche Lösung: Feedback-Credits
+### 11.1 Lösung: Feedback-Credits
 
 Ein denkbares System:
 
@@ -677,10 +679,24 @@ Beispiel:
 | Qualifizierte Bewertung | +1 |
 | Detaillierte Bewertung | +2 |
 | Bewertung als hilfreich markiert | +1 |
+| Tägliches Einloggen (geschenkte Credits) | +1 pro Tag |
 | Eigenes Video testen | -5 |
 
 > [!note]
 > Die Zahlen sind lediglich ein Modellbeispiel.
+
+#### Geschenkte Credits für regelmäßiges Einloggen
+
+Wer sich regelmäßig einloggt, bekommt täglich eine kleine Menge Credits geschenkt. Das soll Nutzer dazu bringen, häufig zurückzukommen, und hält die Plattform aktiv.
+
+> [!warning] Spannung mit der Grundregel „Erst bewerten, dann hochladen“
+> Login-Credits belohnen das Einloggen, nicht das Feedback. Sind sie zu großzügig, kann jemand allein durch Einloggen genug Credits für einen Upload sammeln, ohne je ein Video bewertet zu haben. Damit wäre die Grundregel aus Kapitel 3.1 ausgehebelt.
+>
+> Mögliche Absicherungen (noch zu entscheiden):
+> - Login-Credits bleiben klein im Verhältnis zu den Kosten eines Uploads.
+> - Obergrenze für Login-Credits pro Woche.
+> - Ein Upload erfordert zusätzlich eine Mindestzahl eigener Bewertungen, unabhängig vom Credit-Stand.
+> - Login-Credits gibt es erst, nachdem der Nutzer an dem Tag ein Video bewertet hat.
 
 Wichtig ist, dass die Nutzer nicht einfach möglichst viele Bewertungen abgeben, sondern hilfreiche Bewertungen.
 
