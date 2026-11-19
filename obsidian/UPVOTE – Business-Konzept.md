@@ -265,19 +265,54 @@ Hier liegt langfristig ein besonders großes Potenzial von Upvote.
 
 Die Plattform soll nicht nur Meinungen sammeln, sondern möglichst auch messbare Erkenntnisse liefern.
 
-### 4.1 Zuschauerverhalten
+### 4.1 Vollständiges Video-Tracking für Creator
 
-Upvote könnte erfassen:
+> [!important] Grundsatz
+> Jeder Creator soll jedes seiner Videos umfassend auswerten können. Alle erhobenen Daten zu einem Video stehen dem Creator offen, damit er seine eigenen Fehler analysieren kann.
 
-- Wie viele Nutzer ein Video vollständig ansehen.
-- Wann Nutzer das Video verlassen.
-- Welche Abschnitte besonders häufig erneut angesehen werden.
-- Welche Videos besonders viele positive Reaktionen bekommen.
-- Wie sich die Zuschauerbindung zwischen verschiedenen Videos unterscheidet.
+**Zuschauerverhalten**
+
+| Kennzahl | Was der Creator daraus lernt |
+|---|---|
+| Aufrufe / Anzahl Testzuschauer | Wie groß die Datenbasis ist |
+| Durchschnittliche Watchtime | Wie lange das Video im Schnitt gehalten wird |
+| Abschlussrate | Wie viele das Video bis zum Ende sehen |
+| Retention-Kurve mit Absprungpunkten | An welcher Sekunde Zuschauer abspringen |
+| Rewatch-Stellen | Welche Abschnitte erneut angesehen werden |
+
+**Engagement**
+
+| Kennzahl | Was der Creator daraus lernt |
+|---|---|
+| Anzahl Bewertungen | Wie viel Feedback das Video ausgelöst hat |
+| Time to First Feedback | Wie schnell das Video bewertet wurde |
+| Länge und Tiefe der Begründungen | Wie stark das Video zum Nachdenken anregt |
+| Als hilfreich markiertes Feedback | Welche Rückmeldungen am wertvollsten sind |
+
+**Bewertungstendenz**
+
+| Kennzahl | Was der Creator daraus lernt |
+|---|---|
+| Verteilung Positiv / Negativ / Unklar | Grundtendenz der Wahrnehmung |
+| Häufigste Kritikpunkte | Wiederkehrende Schwächen |
+| Häufigste Stärken | Was beibehalten werden sollte |
+| Zeitmarken-Heatmap | Wo im Video Lob, Kritik und Unklarheiten gehäuft auftreten |
+
+**Entwicklung und Vergleich**
+
+- Vergleich mit den eigenen früheren Videos.
+- Entwicklung der Kennzahlen über die Zeit (wird der Creator besser?).
+- Vergleich zwischen zwei Versionen desselben Videos.
+- Später: Vergleich mit dem Durchschnitt der Nische (siehe 4.2).
 
 Wichtig ist die technische Unterscheidung:
 
 Ein Like oder eine Bewertung ist messbar. Ein tatsächlicher Absprung lässt sich nur zuverlässig erfassen, wenn die Wiedergabe entsprechend instrumentiert ist und ein Nutzer das Video tatsächlich verlässt oder überspringt.
+
+> [!warning] Grenzen der Aussagekraft
+> - **Kleine Stichproben:** Bei 3–10 Testzuschauern pro Video sind Durchschnittswerte wie Watchtime oder Abschlussrate stark zufallsabhängig. Ein einzelner Zuschauer kann die Abschlussrate um 10–30 Prozentpunkte verschieben. Das Dashboard sollte deshalb immer die Anzahl der Zuschauer neben jeder Kennzahl anzeigen.
+> - **Verzerrtes Zuschauerverhalten:** Testzuschauer auf Upvote schauen, um zu bewerten und Credits zu verdienen. Sie springen seltener ab als ein TikTok-Nutzer, der durch den Feed scrollt. Watchtime und Abschlussrate auf Upvote sind deshalb vermutlich zu optimistisch und nicht direkt mit TikTok-Analytics vergleichbar.
+> - **Datenschutz:** Das Sehverhalten der Testzuschauer ist personenbezogen. Creator sollten nur zusammengefasste Werte sehen, nicht, welcher einzelne Nutzer wann abgesprungen ist.
 
 ### 4.2 Vergleich mit anderen Videos
 
@@ -488,7 +523,7 @@ Das bedeutet: Die grundlegenden Funktionen sind kostenlos, während fortgeschrit
 - Zugriff auf die eigene Nische.
 - Videos anderer Creator bewerten.
 - Feedback erhalten.
-- Grundlegende Statistiken.
+- Vollständiges Video-Tracking (siehe Kapitel 4.1).
 - Begrenzte Anzahl aktiver Tests.
 
 **Ziel:** Eine möglichst große aktive Community aufbauen.
@@ -512,6 +547,10 @@ Mögliche Pro-Funktionen:
 - Mehr Video-Uploads.
 - Erweiterte Analyse-Dashboards.
 - Detaillierte Retention-Auswertungen.
+
+> [!warning] Offene Entscheidung: Was bleibt für Pro übrig?
+> Laut Kapitel 4.1 sollen alle Creator jedes Video umfassend auswerten können. Damit fallen Analyse-Dashboards und Retention-Auswertungen als Pro-Verkaufsargument weg. Es muss entschieden werden, womit Pro sich stattdessen abhebt, zum Beispiel mehr Uploads, KI-Analyse, Nischenvergleich, Versionsvergleich oder längere Datenhistorie.
+
 - KI-gestützte Videoanalyse.
 - Individuelle Feedback-Auswertungen.
 - Vergleich mit anderen Videos derselben Nische.
@@ -606,7 +645,8 @@ Das ist eine erste, reduzierte Produktversion, mit der wir überprüfen, ob das 
 | Blind-Feedback | Notwendig |
 | Feedback-Übersicht | Notwendig |
 | Einfaches Punktesystem | Sinnvoll |
-| Retention-Analytics | Später |
+| Video-Tracking: Datenerfassung (Watchtime, Absprünge, Bewertungen) | Notwendig |
+| Video-Tracking: Analyse-Dashboard für Creator | Notwendig |
 | KI-Analyse | Später |
 | Vergleichsdatenbank | Später |
 | Premium-Abonnement | Später |
@@ -691,7 +731,7 @@ Beispiel:
 | Qualifizierte Bewertung | +1 |
 | Detaillierte Bewertung | +2 |
 | Bewertung als hilfreich markiert | +1 |
-| Täglicher Bonus (nur an Tagen mit eigenem Post) | +1 pro Tag |
+| Daily Credits (nur an Tagen mit mindestens 1 Bewertung) | +1 pro Tag |
 | Eigenes Video testen | -5 |
 
 > [!note]
@@ -699,14 +739,12 @@ Beispiel:
 
 #### Geschenkte Daily Credits
 
-Nutzer bekommen täglich eine kleine Menge Credits geschenkt, **aber nur an Tagen, an denen sie selbst etwas gepostet haben.**
+Nutzer bekommen täglich eine kleine Menge Credits geschenkt, **aber nur an Tagen, an denen sie mindestens ein Video bewertet haben.**
 
-Da ein Post Credits kostet, die man nur durch Bewertungen anderer Videos verdient, kann man die Daily Credits nicht ohne vorherige Bewertungen bekommen. Die Grundregel „Erst bewerten, dann hochladen“ (Kapitel 3.1) bleibt damit intakt.
+Damit belohnen die Daily Credits genau das Verhalten, das die Plattform am Leben hält: regelmäßiges Zurückkommen und Feedback geben. Die Grundregel „Erst bewerten, dann hochladen“ (Kapitel 3.1) bleibt intakt, weil auch die Daily Credits nur durch Bewertungen entstehen.
 
-> [!warning] Nebenwirkungen, die beobachtet werden müssen
-> - **Der Bonus macht Posten billiger.** Mit den Beispielzahlen kostet ein Upload effektiv nur noch 4 statt 5 Credits. Pro Video entsteht also etwas weniger Feedback-Pflicht. Die Upload-Kosten müssen so gewählt sein, dass trotzdem jedes Video genügend Bewertungen bekommt.
-> - **Belohnt wird Posten, nicht Zurückkommen.** Nutzer, die nur bewerten, aber an dem Tag nichts posten, erhalten nichts. Gerade diese Feedbackgeber braucht die Plattform aber.
-> - **Anreiz zu täglichem Posten.** Das kann zu schnell produzierten, schwächeren Videos führen, die Feedback binden. Die Beispiel-Persona postet 3–5 Videos pro Woche, nicht täglich.
+> [!warning] Zu beobachten
+> Es besteht der Anreiz, täglich eine einzige, schnelle Pflichtbewertung abzugeben, nur um den Bonus zu erhalten. Deshalb sollte nur eine **qualifizierte Bewertung** (alle Pflichtfelder mit Begründung ausgefüllt) die Daily Credits freischalten.
 
 Wichtig ist, dass die Nutzer nicht einfach möglichst viele Bewertungen abgeben, sondern hilfreiche Bewertungen.
 
