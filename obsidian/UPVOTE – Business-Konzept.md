@@ -201,7 +201,19 @@ Ein besonders wichtiger Bestandteil ist die Reihenfolge:
 
 Das verhindert, dass die erste Meinung automatisch die Meinungen der anderen beeinflusst.
 
-Dieses Prinzip wird in der Forschung häufig als Reduktion von Ankereffekten und sozialem Einfluss diskutiert.
+Die Forschung stützt diese Idee: Wer die Meinung anderer schon kennt, passt sein eigenes Urteil daran an.
+
+> [!quote] Forschungsgrundlage
+> **Muchnik, Aral & Taylor (2013): „Social Influence Bias: A Randomized Experiment“, *Science* 341, S. 647–651.**
+> Fünfmonatiges Experiment auf einer großen Nachrichten-Aggregator-Seite. Kommentare bekamen zufällig ein künstliches erstes Upvote. Folge: 32 % höhere Wahrscheinlichkeit für weitere positive Bewertungen und durchschnittlich 25 % höhere Endbewertung (Herdeneffekt). Negative Manipulation wurde dagegen meist von anderen Nutzern korrigiert.
+>
+> **Lorenz, Rauhut, Schweitzer & Helbing (2011): „How social influence can undermine the wisdom of crowd effect“, *PNAS* 108(22), S. 9020–9025.** DOI: 10.1073/pnas.1008636108
+> Laborexperiment mit 144 Teilnehmenden. Schon milder sozialer Einfluss (Sehen der Schätzungen anderer) verringert die Vielfalt der Antworten, ohne die Genauigkeit der Gruppe zu verbessern.
+
+> [!warning] Grenzen der Übertragbarkeit
+> - Beide Studien untersuchen einfache Bewertungen (Upvotes bzw. Zahlenschätzungen), nicht ausführliches, qualitatives Feedback zu kreativen Inhalten wie Videos.
+> - Es gibt Gegenbefunde: Becker, Brackbill & Centola (2017, *PNAS*) zeigen, dass sozialer Austausch in dezentralen Netzwerken die Genauigkeit von Gruppen auch verbessern kann.
+> - Die Studien belegen also, dass sichtbare Meinungen andere beeinflussen. Ob Blind-Feedback bei Upvote zu besserem Feedback führt, ist damit nicht bewiesen.
 
 Allerdings müssen wir testen, ob die Funktion tatsächlich zu ehrlicherem und vielfältigerem Feedback führt.
 
