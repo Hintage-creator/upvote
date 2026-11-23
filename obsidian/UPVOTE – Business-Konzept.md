@@ -244,9 +244,9 @@ Dadurch wird Feedback deutlich konkreter.
 
 ### 3.4 Bewertungssystem für Feedbackgeber
 
-Eine weitere strategische Möglichkeit ist ein Feedback-Reputationssystem.
+Upvote belohnt nicht die Menge, sondern die Qualität von Feedback. Grundlage ist ein Feedback-Reputationssystem.
 
-Nutzer könnten Punkte erhalten für:
+Nutzer erhalten Punkte für:
 
 - vollständige Bewertungen.
 - hilfreiche Begründungen.
@@ -256,6 +256,42 @@ Nutzer könnten Punkte erhalten für:
 
 > [!warning] Wichtig
 > Punkte sollten nicht einfach für möglichst viele Kommentare vergeben werden. Sonst entsteht wieder Spam.
+
+#### Creator bewerten das erhaltene Feedback
+
+Creator markieren erhaltene Bewertungen als **hilfreich** oder **weniger hilfreich**. Damit daraus ein ehrliches Qualitätssignal wird und keine Belohnung für nettes Feedback, gelten folgende Regeln:
+
+1. **Gefragt wird nach Umsetzbarkeit, nicht nach Gefallen.**
+   Nicht „War das hilfreich?“, sondern „War dieser Hinweis konkret umsetzbar?“ bzw. „Hast du deswegen etwas an deinem Video geändert?“. Sonst würden Creator Lob als hilfreich und harte Kritik als weniger hilfreich markieren, und das System würde genau die Gefälligkeitsbewertungen belohnen, die das Blind-Feedback verhindern soll.
+2. **Der Absender bleibt beim Markieren verborgen.**
+   Der Creator sieht beim Markieren nicht, von wem das Feedback stammt. So kann niemand Freunde gezielt belohnen oder Kritiker abstrafen.
+3. **Es zählt der Anteil, nicht die Anzahl.**
+   Maßgeblich ist der Anteil hilfreich markierter Bewertungen, erst ab einer Mindestanzahl an Bewertungen. Sonst gewinnt, wer am meisten bewertet, nicht wer am besten bewertet.
+4. **Schutz vor Absprachen.**
+   Hilfreich-Markierungen zählen nur, wenn sie von vielen verschiedenen Creatorn kommen. Gegenseitige Markierungen zwischen denselben zwei Nutzern werden begrenzt gewertet.
+
+#### Stufen statt Top-1-%-Grenze
+
+Statt nur die oberen 1 % zu belohnen, gibt es **Stufen mit festen Schwellen**, zum Beispiel:
+
+| Stufe | Voraussetzung (Beispielwerte, noch festzulegen) |
+|---|---|
+| Bronze | mind. 20 Bewertungen, mind. 50 % als umsetzbar markiert |
+| Silber | mind. 50 Bewertungen, mind. 65 % als umsetzbar markiert |
+| Gold | mind. 100 Bewertungen, mind. 80 % als umsetzbar markiert |
+
+**Warum Stufen?**
+
+- Bei 50 Creatorn in der Startphase wären 1 % ein halber Mensch. Eine Prozentgrenze funktioniert erst bei vielen Nutzern.
+- Eine Top-1-%-Grenze motiviert nur die, die knapp darunter liegen. Mit Stufen hat jeder Nutzer ein erreichbares nächstes Ziel.
+- Eine zusätzliche Top-Liste kann später eingeführt werden, wenn genug Nutzer aktiv sind.
+
+#### Benefits
+
+- Bonus-Credits je Stufe.
+- Sichtbares Abzeichen im Profil.
+- Ihr Feedback wird beim Creator zuerst angezeigt.
+- Höchste Stufe: Upvote Pro kostenlos.
 
 ---
 
@@ -287,7 +323,7 @@ Die Plattform soll nicht nur Meinungen sammeln, sondern möglichst auch messbare
 | Anzahl Bewertungen | Wie viel Feedback das Video ausgelöst hat |
 | Time to First Feedback | Wie schnell das Video bewertet wurde |
 | Länge und Tiefe der Begründungen | Wie stark das Video zum Nachdenken anregt |
-| Als hilfreich markiertes Feedback | Welche Rückmeldungen am wertvollsten sind |
+| Als umsetzbar markiertes Feedback | Welche Rückmeldungen am wertvollsten sind |
 
 **Bewertungstendenz**
 
@@ -730,7 +766,7 @@ Beispiel:
 |---|---|
 | Qualifizierte Bewertung | +1 |
 | Detaillierte Bewertung | +2 |
-| Bewertung als hilfreich markiert | +1 |
+| Bewertung als umsetzbar markiert (siehe Kapitel 3.4) | +1 |
 | Daily Credits (nur an Tagen mit mindestens 1 Bewertung) | +1 pro Tag |
 | Eigenes Video testen | -5 |
 
